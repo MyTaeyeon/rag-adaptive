@@ -1,0 +1,4 @@
+pip install sentence-transformers
+pip install fastapi uvicorn pydantic numpy scikit-learn streamlit
+pip install pypdf python-docx
+pip install python-multipart
