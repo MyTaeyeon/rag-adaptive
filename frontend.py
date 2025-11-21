@@ -21,13 +21,14 @@ Ensure the FastAPI backend is running at the configured ``backend_url``.
 import io
 import requests
 import streamlit as st
+from typing import List
 
 
 # Base URL of the backend API
 backend_url = "http://localhost:8000"
 
 
-def list_collections() -> list[str]:
+def list_collections() -> List[str]:
     try:
         resp = requests.get(f"{backend_url}/collections")
         if resp.status_code == 200:
@@ -52,7 +53,7 @@ def delete_collection(name: str) -> str:
     return resp.json().get("message", "Deleted")
 
 
-def upload_files(name: str, files: list[io.BytesIO]) -> str:
+def upload_files(name: str, files: List[io.BytesIO]) -> str:
     # Prepare multipart form-data
     files_data = []
     for file in files:
