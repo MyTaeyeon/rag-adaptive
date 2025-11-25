@@ -11,20 +11,13 @@ cấu trúc schema lõi:
 
 ---
 
+Data preparation's script:
 
-### HotpotQA mapping:
+    cd datasets
+    python ./scripts/normalize_and_write.py data/viquad/train.jsonl --config config/normalization.yaml
 
+merged
 
-| HotpotQA field     | Unified field         | Mapping                                    |
-| ------------------ | --------------------- | ------------------------------------------ |
-| `id`               | `id`                  | giữ nguyên                                 | 
-| `question`         | `question`            | giữ nguyên                                 |
-| `answer`           | `answers`             | biến từ string → list: `[answer]`          | 
-| `context`          | `context_docs`        | GIỮ nguyên dạng structured (list document) | 
-| `context`          | `context` (flattened) | GỘP nhiều document vào 1 string            | 
-| `type`             | `type`                | giữ nguyên                                 | 
-| `level`            | `level`               | giữ nguyên                                 | 
-| `supporting_facts` | `supporting_facts`    | giữ nguyên nhưng enrich thêm câu văn       | 
-| *(mới thêm)*       | `dataset`             | `"hotpotqa"`                               | 
+	python scripts/normalize_and_split.py --input vimed/raw/train.jsonl --out_dir vimed/process/ --config config/normalization.yaml
 
----
+	python scripts/norm_merge.py --inputs vimed/raw/train.jsonl --out_dir vimed/process/ --config config/normalization.yaml

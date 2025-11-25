@@ -1,4 +1,5 @@
 import json
+from pprint import pprint
 
 def convert_hotpot_record(r):
     uid = r['id']
@@ -38,17 +39,22 @@ def convert_hotpot_record(r):
             "sent_id": idx,
             "sentence": sent_text
         })
+
+    # metadata
+    metadata = {
+        "context_docs": context_docs,
+        "supporting_fact": sf_full,
+        "type": r['type'],
+        "level": r['level']
+    }
     
     return {
         "id": uid,
         "question": uquestion,
         "context": flattened_context,
-        "answer": answer,
+        "answers": answer,
         "dataset": "hotpotqa",
-        "context_docs": context_docs,
-        "supporting_fact": sf_full,
-        "type": r['type'],
-        "level": r['level']
+        "metadata": metadata
     }
 
 def convert_vimed_record(r):
@@ -72,6 +78,7 @@ def convert_vimed_record(r):
 
     # metadata
     metadata = {
+        "context_docs": context_docs,
         "keywords": r.get("keyword"),
         "topic": r.get("topic"),
         "article_url": r.get("article_url"),
@@ -85,7 +92,6 @@ def convert_vimed_record(r):
         "context": flattened_context,
         "answers": answers,
         "dataset": "vimed",
-        "context_docs": context_docs,
         "metadata": metadata
     }
     return unified
@@ -192,22 +198,43 @@ def convert_viquad_record(r):
         "question": question,
         "context": (title + ". " + context_text).strip() if title else context_text,
         "answers": answers,
-        "answers_spans": answers_spans,      # <-- useful for extractive readers
         "dataset": "viquad",
-        "context_docs": context_docs,
         "metadata": {
             "uit_id": r.get("uit_id"),
             "is_impossible": is_impossible,
-            "plausible_answers": r.get("plausible_answers")
+            "context_docs": context_docs,
+            "plausible_answers": r.get("plausible_answers"),
+            "answers_spans": answers_spans      # <-- useful for extractive readers
         }
     }
     return unified
+
+def is_valid(item):
+    # Check schema lõi
+    if any(k not in item for k in ["id", "question", "context", "answers", "dataset"]):
+        return False
+    if not isinstance(item["id"], str):
+        return False
+    if not isinstance(item["question"], str):
+        return False
+    if not isinstance(item["context"], str):
+        return False
+    if not isinstance(item["answers"], list) or len(item["answers"]) == 0:
+        return False
+    if item["dataset"] not in ["viquad", "vimed", "hotpotqa"]:
+        return False
+
+    return True
 
 def convert_hotpot_dataset(ds_split, out_path):
     out = []
     for i, r in enumerate(ds_split):
         unified = convert_hotpot_record(r)
-        out.append(unified)
+        if (is_valid(unified) == True):
+            out.append(unified)
+        else:
+            pprint(unified)
+            input(">>>>> continue?(y/n)  ")
     # write jsonl
     with open(out_path, "w", encoding="utf8") as f:
         for o in out:
@@ -218,7 +245,11 @@ def convert_vimed_dataset(ds_split, out_path):
     out = []
     for i, r in enumerate(ds_split):
         unified = convert_vimed_record(r)
-        out.append(unified)
+        if (is_valid(unified) == True):
+            out.append(unified)
+        else:
+            pprint(unified)
+            input(">>>>> continue?(y/n)  ")
     # write jsonl
     with open(out_path, "w", encoding="utf8") as f:
         for o in out:
@@ -229,7 +260,11 @@ def convert_viquad_dataset(ds_split, out_path):
     out = []
     for i, r in enumerate(ds_split):
         unified = convert_viquad_record(r)
-        out.append(unified)
+        if (is_valid(unified) == True):
+            out.append(unified)
+        else:
+            pprint(unified)
+            input(">>>>> continue?(y/n)  ")
     # write jsonl
     with open(out_path, "w", encoding="utf8") as f:
         for o in out:
