@@ -1,20 +1,4 @@
 """
-FastAPI backend for Adaptive Retrieval-Augmented Generation (RAG)
-================================================================
-
-This module implements a minimal backend service for a RAG system with adaptive
-retrieval.  It exposes endpoints to manage collections, upload documents,
-perform chunking, build retrieval indices (both sparse BM25 and dense
-embeddings) and run hybrid queries.  The core logic follows the design laid
-out in the project description: an adaptive controller first determines how
-many documents to fetch based on query complexity, a hybrid retriever
-combines BM25 and dense retrieval, and results are fused using Reciprocal
-Rank Fusion (RRF).
-
-**Usage**
-```
-uvicorn backend:app --reload
-```
 
 Once running, you can use a Streamlit frontend or any HTTP client to:
 
@@ -48,8 +32,6 @@ from pydantic import BaseModel
 
 import numpy as np
 
-# Attempt to import optional dependencies.  These imports may fail on a fresh
-# system; the fallback implementations handle missing modules gracefully.
 try:
     from sentence_transformers import SentenceTransformer, CrossEncoder  # type: ignore
 except Exception:
