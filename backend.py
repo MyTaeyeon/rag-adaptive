@@ -1,25 +1,3 @@
-"""
-
-Once running, you can use a Streamlit frontend or any HTTP client to:
-
-1. Create a collection: `POST /collections` with JSON `{ "name": "mycol" }`.
-2. Upload documents: `POST /collections/{name}/documents` with multipart
-   files.
-3. Query: `POST /collections/{name}/query` with JSON `{ "query": "your
-   question" }`.
-4. List collections: `GET /collections`.
-5. Delete a collection: `DELETE /collections/{name}`.
-
-Dependencies
-------------
-The backend uses only standard Python and NumPy/Scikit‑Learn.  If available,
-it will attempt to use `sentence_transformers` for more powerful dense
-embeddings; otherwise it falls back to TF‑IDF vectors.  Document parsing
-relies on `pypdf` for PDFs and `python-docx` for Word documents.  If those
-libraries are not installed, plain text extraction may fail for those formats.
-
-"""
-
 from __future__ import annotations
 
 import os
@@ -31,37 +9,16 @@ from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from pydantic import BaseModel
 
 import numpy as np
+from sentence_transformers import SentenceTransformer, CrossEncoder  
 
-try:
-    from sentence_transformers import SentenceTransformer, CrossEncoder  # type: ignore
-except Exception:
-    SentenceTransformer = None  # type: ignore
-    CrossEncoder = None  # type: ignore
+import docx  # type: ignore
 
-try:
-    import docx  # type: ignore
-except Exception:
-    docx = None  # type: ignore
-
-try:
-    import pypdf  # type: ignore
-except Exception:
-    pypdf = None  # type: ignore
+import pypdf  # type: ignore
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import normalize
 
 # -------------------------------------------------------------------------
-# Normalisation utilities
-#
-# The original RAG pipeline included a helper ``_normalize`` that removed
-# accents to support languages such as Vietnamese.  For an English‑first
-# pipeline accents are rarely used, and removing diacritics can negatively
-# impact retrieval precision on proper names and technical terms.  We
-# therefore introduce a separate normalisation function dedicated to
-# English that simply lowercases the text.  All retrieval components use
-# ``english_normalize`` instead of ``_normalize`` when indexing and
-# querying.
 # -------------------------------------------------------------------------
 
 def english_normalize(text: str) -> str:
@@ -391,17 +348,12 @@ class Collection:
         model_name = dense_model_name or "sentence-transformers/colbert-distilroberta-v1"
         self.dense = DenseRetriever(model_name)
         self.controller = AdaptiveController()
-        # Initialise a cross‑encoder based re‑ranker.  If the model cannot
-        # be loaded (e.g. missing dependencies), the ``available`` flag will
-        # be false and it will return zero scores.  This allows the system
-        # to degrade gracefully on smaller machines.
         self.reranker = CrossEncoderReranker()
 
     def add_documents(self, docs: List[str], meta: List[Dict]) -> None:
         """Add document chunks with associated metadata."""
         self.chunks.extend(docs)
         self.metadata.extend(meta)
-        # update indices
         self.bm25.add_documents(docs)
         self.dense.add_documents(docs)
 
