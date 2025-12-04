@@ -1,7 +1,0 @@
-nfkc: true            # Unicode normalization (NFKC)
-lowercase: false      
-remove_html: true     
-strip_extra_whitespace: true  
-sentence_split: true 
-preserve_newlines: false 
-max_context_len: null 

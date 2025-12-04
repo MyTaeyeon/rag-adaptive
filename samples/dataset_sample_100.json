@@ -1,0 +1,702 @@
+[
+  {
+    "id": "nq_83810",
+    "question": "where does honey i'm home come from",
+    "ground_truth": "Hi Honey, I'm Home! Hi Honey, I'm Home! is an American television sitcom that ran from July 19, 1991, to July 12, 1992 for 13 episodes. Each week, a new episode of the series aired on ABC as part of its Friday night TGIF lineup. The same episode would re-air Sunday night on Nickelodeon as part of the channel's Nick at Nite lineup. ABC stopped airing the series after the sixth episode of the first season. The show's second and final season only aired on Nick at Nite before being canceled in July 1992.[1] The series was taped before a live audience in Nickelodeon Studios at Universal Studios Florida.",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_14592",
+    "question": "when was dirty dancing supposed to be set",
+    "ground_truth": "Dirty Dancing In the summer of 1963, 17-year-old Frances \"Baby\" Houseman (Jennifer Grey) is vacationing with her affluent family at Kellerman's,[5][6] a resort in the Catskill Mountains. Baby is the younger of two daughters, and plans to attend Mount Holyoke College to study economics in underdeveloped countries and then enter the Peace Corps. Her father, Jake (Jerry Orbach), is the doctor and friend of Max Kellerman (Jack Weston), the resort proprietor. Baby is befriended by Max's grandson Neil (Lonny Price). Baby develops a crush on the resort's dance instructor, Johnny Castle (Patrick Swayze). Johnny is the leader of the resort's working-class entertainment staff. Baby encounters Johnny's cousin Billy on a walk through the resort grounds, and helps him carry watermelons to the staff quarters. The staff hold secret after-hours parties in their quarters, and Baby is surprised by the \"dirty dancing\" they engage in.[7] Intrigued, Baby receives a brief, impromptu dance lesson from Johnny.",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_3278",
+    "question": "when did the european convention on human rights come into force",
+    "ground_truth": "European Convention on Human Rights The European Convention on Human Rights (ECHR) (formally the Convention for the Protection of Human Rights and Fundamental Freedoms) is an international treaty to protect human rights and fundamental freedoms in Europe. Drafted in 1950 by the then newly formed Council of Europe,[1] the convention entered into force on 3 September 1953. All Council of Europe member states are party to the Convention and new members are expected to ratify the convention at the earliest opportunity.[2]",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_97196",
+    "question": "where do the digestive enzymes go that are produced by the pancreas",
+    "ground_truth": "Pancreatic juice Pancreatic juice is secreted into the duodenom through duodenal papilla. Some individuals have also an accessory duct, named accessory pancreatic duct, which may be functional (that is, it also empties the contents of the exocine pancreas into the duodenum) or non-functional.",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_36048",
+    "question": "minister for housing planning and local government ireland",
+    "ground_truth": "Minister for Housing, Planning and Local Government The current Minister for Housing, Planning and Local Government is Eoghan Murphy, TD. He is assisted by:",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_32098",
+    "question": "who removed the 7 books from the bible",
+    "ground_truth": "Luther's canon Luther made an attempt to remove the books of Hebrews, James, Jude and Revelation from the canon (notably, he perceived them to go against certain Protestant doctrines such as sola gratia and sola fide), but this was not generally accepted among his followers. However, these books are ordered last in the German-language Luther Bible to this day.[5]",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_29256",
+    "question": "when did the national league and american league merge",
+    "ground_truth": "Major League Baseball Major League Baseball (MLB) is a professional baseball organization, the oldest of the four major professional sports leagues in the United States and Canada. A total of 30 teams play in the National League (NL) and American League (AL), with 15 teams in each league. The NL and AL were formed as separate legal entities in 1876 and 1901 respectively. After cooperating but remaining legally separate entities beginning in 1903, the leagues merged into a single organization led by the Commissioner of Baseball in 2000.[6][7] The organization also oversees Minor League Baseball, which comprises about 240 teams affiliated with the Major League clubs. With the World Baseball Softball Confederation, MLB manages the international World Baseball Classic tournament.",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_18289",
+    "question": "what season do lorelai and christopher get married",
+    "ground_truth": "Gilmore Girls (season 7) The season picks up with Lorelai having slept with Christopher immediately after ending her engagement to Luke, while Rory is attempting a long-distance relationship with Logan. Lorelai and Christopher attempt a relationship and, after going to Paris together, come back married. The marriage lasts until midway through the season but Christopher struggles to fit into Lorelai's life in Stars Hollow. Luke learns Anna is moving to New Mexico with April and applies for joint custody, winning after Lorelai gives him a glowing character reference. Christopher finds out and he and Lorelai argue, with Christopher feeling like second choice. Richard, who has just started working at Yale as a lecturer, has a heart attack during a class and Christopher stays away from the hospital while everyone worries about him. He and Lorelai eventually admit their marriage isn't right and split. Emily struggles with the finances while Richard is convalescing and Lorelai helps her out.",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_96530",
+    "question": "who has the record for the longest time in space",
+    "ground_truth": "List of spaceflight records Gennady Padalka, who has spent 879 days in space over 5 missions, became the man who spent the most time in space when he surpassed, on 28 June 2015, the record of Sergei Krikalev who spent 803 days, 9 hours and 39 minutes, or 2.2 years in space over the span of six spaceflights on Soyuz, the Space Shuttle, Mir, and the International Space Station. Currently, second is Yuri Malenchenko who spent 828 days in space on six spaceflights.[7][8][9][10]",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_13434",
+    "question": "how many wheel of fortune million dollar winners",
+    "ground_truth": "Wheel of Fortune (U.S. game show) If the contestant has the Million Dollar Wedge, the $100,000 envelope is replaced with a $1,000,000 envelope. The $1,000,000 prize has been awarded three times: to Michelle Loewenstein (on the episode that aired October 14, 2008),[15] to Autumn Erhard (May 30, 2013),[16] and to Sarah Manchester (September 17, 2014).[17] Contestants who win the $1,000,000 may receive it in installments over 20 years, or in a lump sum of that amount's present value.[18] At the end of the Bonus Round, Sajak will reveal where the $1,000,000 envelope was on the prize wheel if the contestant failed to land on it.",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_88696",
+    "question": "how many parts are there for twilight movie",
+    "ground_truth": "The Twilight Saga (film series) The Twilight Saga is a series of five romance fantasy films from Summit Entertainment based on the four novels by American author Stephenie Meyer. The films star Kristen Stewart, Robert Pattinson, and Taylor Lautner. The series has grossed over $3.3 billion in worldwide receipts and consists, to date, of five motion pictures. The first installment, Twilight, was released on November 21, 2008.[1] The second installment, New Moon, followed on November 20, 2009, breaking box office records as the biggest midnight screening and opening day in history, grossing an estimated $72.7 million.[2] The third installment, Eclipse, was released on June 30, 2010,[3] and was the first Twilight film to be released in IMAX.[4]",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_97080",
+    "question": "legend of zelda breath of the wild copies sold",
+    "ground_truth": "The Legend of Zelda: Breath of the Wild Breath of the Wild broke sales records for a Nintendo launch game in multiple regions.[133][134] In Japan, the Switch and Wii U versions sold a combined 230,000 copies in the first week of release, with the Switch version becoming the top-selling game released that week.[135] In the UK, Breath of the Wild was the second-bestselling retail game its week of release behind Horizon Zero Dawn, and became the third-bestselling Zelda game behind Wind Waker and Twilight Princess.[136][137] In the United States, Breath of the Wild was the second-bestselling video game during its month of release behind Tom Clancy's Ghost Recon Wildlands.[138] Nintendo reported that Breath of the Wild sold more than one million copies in the US that month, 925,000 of which were for Switch - a 100% attach rate.[139][140][141][142] That month, Nintendo reported it had sold 3.84 million copies of Breath of the Wild worldwide, 1.08 million for Wii U and 2.76 million for Switch, surpassing the Switch's global sales of 2.74 million for the same period.[143] Nintendo president Tatsumi Kimishima said that the attach rate of Breath of the Wild to the Switch was \"unprecedented\".[144] By June 2018, the Switch version had sold 9.32 million copies,[145] and the Wii U version 1.5 million, for a total of 10.82 million, making Breath of the Wild the best-selling Zelda game.[146] By September 2018, the Switch version reached 10.28 million copies sold.[147]",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_71482",
+    "question": "where does most of earths freshwater come from",
+    "ground_truth": "Fresh water The source of almost all fresh water is precipitation from the atmosphere, in the form of mist, rain and snow. Fresh water falling as mist, rain or snow contains materials dissolved from the atmosphere and material from the sea and land over which the rain bearing clouds have traveled. In industrialized areas rain is typically acidic because of dissolved oxides of sulfur and nitrogen formed from burning of fossil fuels in cars, factories, trains and aircraft and from the atmospheric emissions of industry. In some cases this acid rain results in pollution of lakes and rivers.",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_11395",
+    "question": "what was the official name of dehradhun during british raj",
+    "ground_truth": "Dehradun Dehradun (/ˌdɛərəˈduːn/) or Dehra Dun is the interim capital city of Uttarakhand, a state in the northern part of India. Located in the Garhwal region, it lies 236 kilometres (147 mi) north of India's capital New Delhi and 168 kilometres (104 mi) from Chandigarh. It is one of the \"Counter Magnets\" of the National Capital Region (NCR) being developed as an alternative centre of growth to help ease the migration and population explosion in the Delhi metropolitan area and to establish a smart city at Dehradun.[3] During the days of British Raj, the official name of the town was Dehra.[4]",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_77397",
+    "question": "who wrote and sang when i'm 64",
+    "ground_truth": "When I'm Sixty-Four \"When I'm Sixty-Four\" is a song by the Beatles, written by Paul McCartney[4][5] (credited to Lennon–McCartney) and released in 1967 on their album Sgt. Pepper's Lonely Hearts Club Band.",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_55302",
+    "question": "who sings rock me mama like a wagon wheel",
+    "ground_truth": "Wagon Wheel (song) \"Wagon Wheel\" is a song co-written by Bob Dylan and Ketch Secor of Old Crow Medicine Show.[2] Dylan recorded the chorus in 1973; Secor added verses 25 years later. Old Crow Medicine Show's final version was certified Platinum by the Recording Industry Association of America in April 2013.[3]",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_4165",
+    "question": "excise duty stamps of central govt. are printed in",
+    "ground_truth": "Excise stamp In the UK, excise stamps have been in use for spirits since 2006.(view image) While these are usually printed on the back label of the bottle by the manufacturer rather than being a special security bought from the government, they still have to adhere to strict specifications, such as containing UV-visible inks.[2] UK law does not require such physical stamps for cigarettes, either - instead, the words \"UK Duty Paid\" are printed in bold on all packs as part of the manufacturing process, while other forms of control are implemented by HM Revenue & Customs to verify that this is indeed the case. Meanwhile, foreign-bought cigarette packets bearing revenue stamps can be widely seen across the UK, mainly due to the comparatively high price of British cigarettes, leading people to (often illegally) import them from abroad.",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_3905",
+    "question": "what is a cabinet in the us government",
+    "ground_truth": "Cabinet of the United States The Cabinet of the United States is part of the executive branch of the federal government of the United States that normally acts as an advisory body to the President of the United States. Among the senior officers of the Cabinet are the Vice President and the heads of the federal executive departments, all of whom are by federal law (3 U.S.C. § 19) in the line of succession to the Presidency and have duties under the 25th Amendment to the Constitution. Members of the Cabinet (except for the Vice President) serve at the pleasure of the President, who can dismiss them at will for no cause. All federal public officials, including Cabinet members, are also subject to impeachment by the House of Representatives and trial in the Senate for \"treason, bribery, and other high crimes and misdemeanors\".",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_12280",
+    "question": "a majority of calories in the average american diet come from what macronutrient",
+    "ground_truth": "Western pattern diet The typical American diet is about 50% carbohydrate, 15% protein, and 35% fat.[7] These macronutrient intakes fall within the Acceptable Macronutrient Distribution Ranges (AMDR) for adults identified by the Food and Nutrition Board of the United States Institute of Medicine as \"associated with reduced risk of chronic diseases while providing adequate intakes of essential nutrients,\" which are 45-65% carbohydrate, 10-35% protein, and 20-35% fat as a percentage of total energy.[8] However, the nutritional quality of the specific foods comprising those macronutrients is often poor, as with the \"Western\" pattern discussed above. Complex carbohydrates such as starch are believed to be more healthy than the sugar so frequently consumed in the Standard American Diet.[9][10]",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_28657",
+    "question": "who played bones in the original star trek",
+    "ground_truth": "DeForest Kelley Jackson DeForest Kelley (January 20, 1920 – June 11, 1999), known to colleagues as \"Dee\",[2] was an American actor, screenwriter, poet and singer known for his roles in Westerns and as Dr. Leonard \"Bones\" McCoy of the USS Enterprise in the television and film series Star Trek.",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_30495",
+    "question": "actor who played john bolton in the bill",
+    "ground_truth": "Russell Boulter Russell Boulter (born 7 April 1963 in Liverpool) is an English actor and documentary narrator. He is a communications coach.[1]",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_66237",
+    "question": "when do the ducks march at the peabody",
+    "ground_truth": "Peabody Hotel In 1940, a Bellman by the name of Edward Pembroke volunteered to care for the ducks. Pembroke was given the position of \"Duckmaster\" and served in that position until 1991. As a former circus animal trainer, he taught the ducks to march into the hotel lobby, which started the famous Peabody Duck March.[1] Every day at 11:00 a.m., the Peabody Ducks are escorted from their penthouse home, on the Plantation Roof, to the lobby via elevator. The ducks, accompanied by the King Cotton March by John Philip Sousa, then proceed across a red carpet to the hotel fountain, made of a solid block of Italian travertine marble. The ducks are then ceremoniously led back to their penthouse at 5:00 p.m.[8]",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_78907",
+    "question": "what is the name of the first colony established by spain in the new world",
+    "ground_truth": "Spanish colonization of the Americas Columbus made four voyages to the West Indies as the monarchs granted Columbus the governorship of the new territories, and financed more of his trans-Atlantic journeys. He founded La Navidad on the island later named Hispaniola (now divided into Haiti and the Dominican Republic), in what is the present-day Haiti on his first voyage. After its destruction by the indigenous Taino people, the town of Isabella was begun in 1493, on his second voyage. In 1496 his brother, Bartholomew, founded Santo Domingo. By 1500, despite a high death rate, there were between 300 and 1000 Spanish settled in the area. The local Taíno people continued to resist, refusing to plant crops and abandoning their Spanish-occupied villages. The first mainland explorations were followed by a phase of inland expeditions and conquest. In 1500 the city of Nueva Cádiz was founded on the island of Cubagua, Venezuela, followed by the founding of Santa Cruz by Alonso de Ojeda in present-day Guajira peninsula. Cumaná in Venezuela was the first permanent settlement founded by Europeans in the mainland Americas,[2] in 1501 by Franciscan friars, but due to successful attacks by the indigenous people, it had to be refounded several times, until Diego Hernández de Serpa's foundation in 1569. The Spanish founded San Sebastian de Uraba in 1509 but abandoned it within the year. There is indirect evidence that the first permanent Spanish mainland settlement established in the Americas was Santa María la Antigua del Darién.[3]",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_3478",
+    "question": "who has power to declare war in the united states",
+    "ground_truth": "Declaration of war by the United States For the United States, Article One, Section Eight of the Constitution says \"Congress shall have power to ... declare War\". However, that passage provides no specific format for what form legislation must have in order to be considered a \"declaration of war\" nor does the Constitution itself use this term. In the courts, the United States Court of Appeals for the First Circuit, in Doe v. Bush, said: \"[T]he text of the October Resolution itself spells out justifications for a war and frames itself as an 'authorization' of such a war.\"[1] in effect saying an authorization suffices for declaration and what some may view as a formal Congressional \"Declaration of War\" was not required by the Constitution.",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_73563",
+    "question": "what's the polish word for stuffed cabbage",
+    "ground_truth": "Gołąbki Gołąbki [ɡɔˈwɔmpki] is the Polish name of a dish popular in cuisines of Central Europe, made from boiled cabbage leaves wrapped around a filling of minced pork or beef, chopped onions, and rice or barley.",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_26062",
+    "question": "how can rigor mortis determine time of death",
+    "ground_truth": "Rigor mortis The degree of rigor mortis may be used in forensic pathology, to determine the approximate time of death. A dead body holds its position as rigor mortis sets in. If the body is moved after death, but before rigor mortis begins, forensic techniques such as livor mortis can be applied. If the position in which a body is found does not match the location where it is found (for example, if it is flat on its back with one arm sticking straight up), that could mean someone moved it.",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_93850",
+    "question": "when does a man's voice stop getting deeper",
+    "ground_truth": "Voice change Most of the voice change begins around puberty.[4] Adult pitch is reached 2â€“3 years later but the voice does not stabilize until the early years of adulthood. It usually happens months or years before the development of significant facial hair. Under the influence of androgens, the voice box, or larynx, grows in both sexes. This growth is far more prominent in boys than in girls and is more easily perceived. It causes the voice to drop and deepen. Along with the larynx, the vocal folds (vocal cords) grow significantly longer and thicker.",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_85181",
+    "question": "how far is the three point line in highschool",
+    "ground_truth": "Three-point field goal Used only in conference play for several years, it was adopted by the NCAA in April 1986 for the 1986–87 season at 19 ft 9 in (6.02 m)[24][25][26][27] and was first used in the NCAA Tournament in March 1987.[28] The NCAA adopted the three-pointer in women's basketball on an experimental basis for that season at the same distance, and made its use mandatory beginning in 1987–88.[29] In 2007, the NCAA lengthened the men's distance by a foot to 20 ft 9 in (6.32 m), effective with the 2008–09 season,[30] and the women's line was moved to match the men's in 2011–12.[29] American high schools, along with elementary and middle schools, adopted a 19 ft 9 in (6.02 m) line nationally in 1987, a year after the NCAA.[31] The NCAA used the FIBA three-point line (see below) in the National Invitation Tournament (NIT) in 2018.[32]",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_91924",
+    "question": "where did the spanish establish colonies in asia",
+    "ground_truth": "Spanish East Indies The Spanish East Indies (Spanish: Indias orientales espaÃ±olas; Filipino: Silangang Indiyas ng Espanya) were the Spanish territories in Asia-Pacific from 1565 until 1899. They comprised the Philippines, the Mariana Islands, the Caroline Islands (also known as the New Philippine Islands), and briefly also included Spanish Formosa and parts of the Spice Islands. Cebu was the first seat of government, later transferred to Manila. From 1565 to 1821 these territories, together with the Spanish West Indies, were administered through the Viceroyalty of New Spain based in Mexico City. Its administration was then directly made from Spain after the successful independence movements in Mexico.",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_71426",
+    "question": "who signed the voting rights act of 1965",
+    "ground_truth": "Voting Rights Act of 1965 The Voting Rights Act of 1965 is a landmark piece of federal legislation in the United States that prohibits racial discrimination in voting.[7][8] It was signed into law by President Lyndon B. Johnson during the height of the Civil Rights Movement on August 6, 1965, and Congress later amended the Act five times to expand its protections.[7] Designed to enforce the voting rights guaranteed by the Fourteenth and Fifteenth Amendments to the United States Constitution, the Act secured voting rights for racial minorities throughout the country, especially in the South. According to the U.S. Department of Justice, the Act is considered to be the most effective piece of federal civil rights legislation ever enacted in the country.[9]",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_54987",
+    "question": "when did pakistan win the olympic gold medal in hockey for the first time",
+    "ground_truth": "Pakistan at the Olympics The National Olympic Committee for Pakistan was created in 1948. Rome 1960 has been the most successful Olympics for Pakistan so far, with Pakistan winning two medals: a gold medal in field hockey and a bronze medal in wrestling.",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_28893",
+    "question": "when is the next rugby league world cup and where will it be held",
+    "ground_truth": "2017 Rugby League World Cup The 2017 Rugby League World Cup will be the fifteenth staging of the Rugby League World Cup. It will be held in Australia, New Zealand and Papua New Guinea between 26 October and 2 December 2017.[1]",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_58878",
+    "question": "when did the first text message get sent",
+    "ground_truth": "Text messaging SMS messaging was used for the first time on 3 December 1992,[8] when Neil Papworth, a 22-year-old test engineer for Sema Group in the UK[9] (now Airwide Solutions),[10] used a personal computer to send the text message \"Merry Christmas\" via the Vodafone network to the phone of Richard Jarvis[11][12] who was at a party in Newbury, Berkshire which had been organised to celebrate the event. Modern SMS text messaging is[by whom?] usually messaging from one mobile phone to another mobile phone. Finnish Radiolinja became the first network to offer a commercial person-to-person SMS text messaging service in 1994. When Radiolinja's domestic competitor, Telecom Finland (now part of TeliaSonera) also launched SMS text messaging in 1995 and the two networks offered cross-network SMS functionality, Finland became the first nation where SMS text messaging was offered on a competitive as well as on a commercial basis. GSM was allowed[by whom?] in the United States and the radio frequencies were blocked and awarded to US \"Carriers\" to use US technology. Hence there is no \"development\" in the US in mobile messaging service. The GSM in the US had to use a frequency allocated for private communication services (PCS) – what the ITU frequency régime had blocked for DECT – Digital Enhanced Cordless Telecommunications – 1000-feet range picocell, but survived. American Personal Communications (APC), the first GSM carrier in America, provided the first text-messaging service in the United States. Sprint Telecommunications Venture, a partnership of Sprint Corp. and three large cable-TV companies, owned 49 percent of APC. The Sprint venture was the largest single buyer at a government-run spectrum auction that raised $7.7 billion in 2005 for PCS licenses. APC operated under the brand name of Sprint Spectrum and launched its service on November 15, 1995 in Washington, D.C. and in Baltimore, Maryland. Vice President Al Gore in Washington, D.C. made the initial phone-call to launch the network, calling Mayor Kurt Schmoke in Baltimore.[13]",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "hotpot_5abbef6055429931dba145da",
+    "question": "which company deals with the highest number of Natural Resources Pioneer Natural Resources or TransDigm Group:",
+    "ground_truth": "Pioneer Natural Resources",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5a8d0435554299441c6b9fbd",
+    "question": "Alice in Wonderland features the Queen of Hearts' voice by which American actress who was best known for providing many voices in numerous Disney animated films?",
+    "ground_truth": "Verna Felton",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5a81956255429903bc27b97b",
+    "question": "Were Serguei Kouchnerov and Arvid E. Gillstrom both in the same industry?",
+    "ground_truth": "yes",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5ae6bc2155429908198fa6a3",
+    "question": "Dark Girls is a 2012 documentary film by American filmmakers Bill Duke and D. Channsin Berry, it also reports on a new version of the 1940s black doll experiment by who, which were African-American psychologists who as a married team conducted important research among children and were active in the Civil Rights Movement?",
+    "ground_truth": "Kenneth and Mamie Clark",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5ab5c577554299494045f05e",
+    "question": "At what University did the geneticist who supported a former grand wizard of the ku klux klan teach?",
+    "ground_truth": "Florida State University",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5ab6e43d554299710c8d1f9c",
+    "question": "When was the Soviet and Russian theoretical physicist died who was famous for Critical dimension?",
+    "ground_truth": "8 November 2009",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5ae136075542997b2ef7d12e",
+    "question": "Robert Mark Kamen is best known as creator and co-creator of an action film franchise which had its fight scenes choreographed by who?",
+    "ground_truth": "Corey Yuen",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5ae766f75542991e8301cc8b",
+    "question": "Lois Smith plays a supporting role in a 2016 American neo-noir action comedy film set in what city?",
+    "ground_truth": "Los Angeles",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5aba6a7455429901930fa7a8",
+    "question": "What french airline, located in Reunion, France was a founding member of The Vanilla Alliance?",
+    "ground_truth": "Air Austral",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5a7cb0605542996dd594b988",
+    "question": "What movie was released earlier, Moana and Jagga Jasoos?",
+    "ground_truth": "Moana",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5ae45a7b55429970de88d93d",
+    "question": "Which of these was known as the Bear Stearns building at one point, Central Park Place or 245 Park Avenue?",
+    "ground_truth": "245 Park Avenue",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5ae81ede55429952e35eaa31",
+    "question": "What is detected by the HVA metabolite, produced by the organic chemical of the catecholamine and phenethylamine families?",
+    "ground_truth": "oxidative enzymes",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5a8b70225542997f31a41d2e",
+    "question": "Who was the music partner of the artist who released Last Recording?",
+    "ground_truth": "Lester Young",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5ab9dc68554299232ef4a228",
+    "question": "Did Anaïs Nin and Graham Swift originate from the same country?",
+    "ground_truth": "no",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5a73603955429901807db017",
+    "question": "Do Rice University and Lehigh University offer public or private research?",
+    "ground_truth": "private research",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5ae7085d554299572ea5468b",
+    "question": "Chris Stainton first gained recognition with what English singer and musician who was known for his gritty voice?",
+    "ground_truth": "Joe Cocker",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5a732a445542992359bc3258",
+    "question": "what is a prefecture-level city in the north of Shanxi province, People's Republic of China, Shuozhou or Yichun, Jiangxi?",
+    "ground_truth": "Shuozhou",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5ae545bd55429960a22e02ac",
+    "question": "Poker Joe, was a warrior and subchief of the Nez Percé tribe of Native Americans who played a critical role during the flight of the Nez Percé during the Nez Percé War in which year, he was the chosen trail boss and guide of the Nez Percé people following the Battle of the Big Hole?",
+    "ground_truth": "1877",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5a710b015542994082a3e507",
+    "question": "What movie was released 64 years after the original film, which includes Thumper, a fictional rabbit character from Disney?",
+    "ground_truth": "Bambi II",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5adffbfb55429925eb1afbc3",
+    "question": "What tower house did David Gregory inherit in 1664?",
+    "ground_truth": "Kinnairdy Castle",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5a8a4aa955429930ff3c0d7c",
+    "question": "Are The Gaslight Anthem and No Devotion both from the United States?",
+    "ground_truth": "no",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5ae7e74e554299540e5a5688",
+    "question": "The \"DM World Tour\" is the third concert tour by Mexican popstar Dulce María, the tour began on which date?",
+    "ground_truth": "March 24, 2017",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5ac06ebb5542996f0d89cbcd",
+    "question": "How many dance music does the writer of Gross-Wien Op. 440 composed?",
+    "ground_truth": "over 500",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5a886460554299206df2b24d",
+    "question": "What channel does Southern at Heart and Damaris Phillips have in common?",
+    "ground_truth": "Food Network",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5a8088b95542995d8a8ddf8f",
+    "question": "Which band, He Is We or Bright Eyes, was founded by singer-songwriter and guitarist Conor Oberst?",
+    "ground_truth": "Bright Eyes",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5a88e39c5542993b751ca8b2",
+    "question": "Which 2012 science fiction film directed by Ridley Scott was produced by Truenorth productions?",
+    "ground_truth": "Prometheus",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5add5b515542997545bbbd3a",
+    "question": "Kenn Scott has written for a Canadian-Filipino animated television series which chronicles the adventures of who?",
+    "ground_truth": "Milo Powell",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5ae309345542992decbdcdd0",
+    "question": "What award has the costume designer for the Michael Collins biopic starring Liam Neeson been nomination for, a total of six times?",
+    "ground_truth": "Best Costume Design",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5a8ba8945542997f31a41d9e",
+    "question": "Mathew Stuart Sinclair (born 9 November 1975) is an Australian-born New Zealand cricketer, he holds the equal world record for the highest Test score (214) by a number three batsman on debut when he opened his international career against West Indies in the 1999, Boxing Day Test match is a cricket Test match held in Melbourne, Victoria in which country?",
+    "ground_truth": "Australia",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5a73f5ea55429974ef308b9a",
+    "question": "One Manhattan Square and 35 Hudson Yards, are both located in which New York borough?",
+    "ground_truth": "Manhattan",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5a70f2be5542994082a3e420",
+    "question": "Which quarterly academic journal was owned by a leading global financial services firm from 2004 to 2013?",
+    "ground_truth": "Journal of Applied Corporate Finance",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5ac4d52d554299076e296e09",
+    "question": "Which Supreme court ruling United States v. Wong Kim Ark or Wickard v. Filburn was made first ?",
+    "ground_truth": "United States v. Wong Kim Ark",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5a72fcd65542992359bc31f3",
+    "question": "John Huggins was the leader of an organization orginally called what?",
+    "ground_truth": "Black Panther Party for Self-Defense",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "nq_82865",
+    "question": "what is the mm on a credit card",
+    "ground_truth": "Credit card The size of most credit cards is 85.60 mm × 53.98 mm (​3 3⁄8 × ​2 1⁄8 inches) and rounded corners with a radius of 2.88–3.48 mm,[5] conforming to the ISO/IEC 7810 ID-1 standard, the same size as ATM cards and other payment cards, such as debit cards.[6]",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "hotpot_5a80dc1d55429938b614221e",
+    "question": "Are Red State and Hip-Hop: Beyond Beats and Rhymes both documentary films?",
+    "ground_truth": "yes",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5a8d0e625542994ba4e3dbc0",
+    "question": "The Limehouse Declaration was issued, in part, by the Baroness of what constituency?",
+    "ground_truth": "Crosby",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5abc343b554299700f9d7815",
+    "question": "Kathleen Baker is the current world-record holder in the 4x100 metre medley relay along with an American compedition swimmer who qualified for what in 2016?",
+    "ground_truth": "Rio Olympics",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5ac035425542997d642959e4",
+    "question": "Who was an Australian rock band formed in Adelaide in late 1994 that has worked with Anton Hagop?",
+    "ground_truth": "The Superjesus",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5a8a1a8c5542992e4fca8504",
+    "question": "What is the name of the plant that Hina dye is prepared from?",
+    "ground_truth": "Lawsonia inermis",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "nq_9145",
+    "question": "fear the walking dead season 3 new characters",
+    "ground_truth": "Fear the Walking Dead (season 3) AMC renewed the series for a 16-episode third season on April 15, 2016.[7] Production began in January 2017 in Baja, Mexico.[8] This is the final season with co-creator Dave Erickson as showrunner as he will leave the series after the conclusion of the third season.[9] In February 2017, it was announced that Emma Caulfield was cast in the season.[10] In March 2017, it was revealed that Daniel Sharman joined the cast as a series regular.[4] In April 2017, several new actors were announced having joined the series; including Dayton Callie (reprising his guest role from season 2) and Sam Underwood, who, along with Daniel Sharman play members of the Otto family; and Lisandra Tena as Lola Guerrero.[3]",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "hotpot_5ae0ce1e55429945ae95945a",
+    "question": "What is the name of the 4.2 acre public garden in the Smithsonian complex, adjacent to the Smithsonian Castle on the National Mall in Washington?",
+    "ground_truth": "Enid A. Haupt Garden",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "nq_28362",
+    "question": "how did tyne cot cemetery get its name",
+    "ground_truth": "Tyne Cot The name \"Tyne Cot\" is said to come from the Northumberland Fusiliers, seeing a resemblance between the many German concrete pill boxes on this site and typical Tyneside workers' cottages (Tyne cots).[2] Tyne Cot CWGC Cemetery lies on a broad rise in the landscape which overlooks the surrounding countryside. As such, the location was strategically important to both sides fighting in the area. The concrete shelters which still stand in various parts of the cemetery were part of a fortified position of the German Flandern I Stellung,[3] which played an important role in the area during the Battle of Passchendaele in 1917.",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_76157",
+    "question": "what is the most spoken language in mexico",
+    "ground_truth": "Languages of Mexico Many different languages are spoken in Mexico. They are from seven distinct language families and there are two isolates. The total of languages amounts to around 68 and 350 dialects, with a large majority of the population fluent in Spanish while some Indigenous Mexicans are monolingual in indigenous languages. Today, Mexicans predominantly speak Spanish.",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_5136",
+    "question": "who is the original singer of careless whisper",
+    "ground_truth": "Careless Whisper \"Careless Whisper\" is a song by English singer-songwriter George Michael (sometimes credited to \"Wham! featuring George Michael\" in Japan, Canada and the United States). It was released on 24 July 1984, by Epic Records in the United Kingdom, Japan and other countries, and by Columbia Records in North America. The song was George Michael's first solo single, although he was still performing in Wham! at the time (the song is included on Wham!'s album Make It Big).",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "hotpot_5a8df6b45542995085b37367",
+    "question": "In what country are the cities of Laixi and Yingde are located?",
+    "ground_truth": "China",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "nq_6538",
+    "question": "when did the first rocket go to the moon",
+    "ground_truth": "Moon landing A Moon landing is the arrival of a spacecraft on the surface of the Moon. This includes both manned and unmanned (robotic) missions. The first human-made object to reach the surface of the Moon was the Soviet Union's Luna 2 mission, on 13 September 1959.[3]",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_2626",
+    "question": "where is the mass of blood located in a subdural hematoma",
+    "ground_truth": "Subdural hematoma A subdural hematoma (SDH), is a type of hematoma, usually associated with traumatic brain injury. Blood gathers between the inner layer of the dura mater and the arachnoid mater. Usually resulting from tears in bridging veins which cross the subdural space, subdural hemorrhages may cause an increase in intracranial pressure (ICP), which can cause compression of and damage to delicate brain tissue. Subdural hematomas are often life-threatening when acute. Chronic subdural hematomas, however, have a better prognosis if properly managed.",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "hotpot_5adc41af554299438c868d99",
+    "question": "What were Hana Mandlíková and Andrea Jaeger",
+    "ground_truth": "former professional tennis player",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "nq_85203",
+    "question": "where did grateful dead live in san francisco",
+    "ground_truth": "Grateful Dead The Grateful Dead toured constantly throughout their career, playing more than 2,300 concerts.[92] They promoted a sense of community among their fans, who became known as \"Deadheads\", many of whom followed their tours for months or years on end. In their early career, the band also dedicated their time and talents to their community, the Haight-Ashbury area of San Francisco, making available free food, lodging, music, and health care to all. It has been said that the band performed \"more free concerts than any band in the history of music\".[93]",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "hotpot_5a7de0585542997cc2c474b7",
+    "question": "Kangpenqing and Gyala Peri, are located in which well known range of mountains, in Asia?",
+    "ground_truth": "Himalayas",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "nq_93500",
+    "question": "where is the oldest oceanic crust under the atlantic ocean likely to be found",
+    "ground_truth": "Oceanic crust The oldest large scale oceanic crust is in the west Pacific and north-west Atlantic - both are about up to 180-200 million years old. However, parts of the eastern Mediterranean Sea are remnants of the much older Tethys ocean, at about 270 and up to 340 million years old.[21][22][23]",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_88709",
+    "question": "where does the man in the high castle get the films",
+    "ground_truth": "The Man in the High Castle (TV series) The season ends with Himmler and Smith implicitly assuming command of the Reich, and an implied new era of peace and tranquility between the Japanese Empire and the Greater Nazi Reich. Juliana Crain continues to live out her asylum claim inside New York Nazi territory, and the final few minutes of the final episode of the second season show Trudy (or an alternate-universe version of her) alive and well. In a basement somewhere, Smith is given access to a room filled to bursting with reels of films that were watched by the late FÃ¼hrer.",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_79397",
+    "question": "who's playing mary poppins in mary poppins returns",
+    "ground_truth": "Mary Poppins Returns Mary Poppins Returns is an upcoming American musical fantasy film directed by Rob Marshall, with a screenplay by David Magee and from a story by Magee, Marshall, and John DeLuca. A sequel to the 1964 film Mary Poppins, the film stars Emily Blunt as Mary Poppins with Lin-Manuel Miranda, Ben Whishaw, Emily Mortimer, Pixie Davies, Joel Dawson, Nathanael Saleh, Julie Walters, Colin Firth, and Meryl Streep in supporting roles. Set in 1930s London, 25 years after the 1964 film, it sees Mary Poppins, the former nanny of Jane and Michael Banks, re-visiting them after a family tragedy.",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "hotpot_5adddf9d5542997dc7907079",
+    "question": "Between Shibataea and Pediocactus, which is a genus of a Chinese bamboo in the grass family?",
+    "ground_truth": "Shibataea",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "nq_69194",
+    "question": "who wrote the music for fantastic beasts and where to find them",
+    "ground_truth": "Fantastic Beasts and Where to Find Them (soundtrack) Fantastic Beasts and Where to Find Them is the score by James Newton Howard to the film Fantastic Beasts and Where to Find Them.[1]",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_75972",
+    "question": "who won the rugby 7 in las vegas",
+    "ground_truth": "2018 USA Sevens The tournament was won by the United States who beat Argentina 28â€“0 in the final. This was the first time that the United States won its home tournament. USA's Perry Baker led the tournament with 8 tries and 11 breaks.[1]",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "hotpot_5a90c7955542995651fb51ed",
+    "question": "What town in the Sor-varanger Municipality of Norway was the BarentsObserver based in?",
+    "ground_truth": "Kirkenes",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "nq_49531",
+    "question": "who was on the titanic when it sank",
+    "ground_truth": "Sinking of the RMS Titanic As a result, when Titanic sank, over a thousand passengers and crew were still on board. Almost all those who jumped or fell into the water either drowned or died within minutes due to the effects of cold shock and incapacitation. RMSÂ Carpathia arrived on the scene about an hour and a half after the sinking and rescued the last of the survivors by 09:15 on 15 April, some nine and a half hours after the collision. The disaster shocked the world and caused widespread outrage over the lack of lifeboats, lax regulations, and the unequal treatment of the three passenger classes during the evacuation. Subsequent inquiries recommended sweeping changes to maritime regulations, leading to the establishment in 1914 of the International Convention for the Safety of Life at Sea (SOLAS), which still governs maritime safety today.",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "hotpot_5a77b0285542992a6e59df88",
+    "question": "Who oversees operations at a hotel and casino situated on the southern end of the Las Vegas Strip?",
+    "ground_truth": "Corey Sanders",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "hotpot_5adeaa2d55429939a52fe938",
+    "question": "John Bush and Miho Hatori, are American?",
+    "ground_truth": "no",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "nq_30686",
+    "question": "orange is the new black cast member with glasses",
+    "ground_truth": "Lori Petty She guest-starred in the second season, and became a recurring character in the third and fourth seasons, of the Netflix Original series Orange Is the New Black as Lolly Whitehill. Lori also appeared on the television series Prison Break in the last episode of season four.",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_8969",
+    "question": "in the documentary film paris is burning the houses are",
+    "ground_truth": "Paris Is Burning (film) Jennie Livingston, who moved to New York after graduating from Yale to work in film, and who spent six years[4] making Paris Is Burning, concentrated on interviews with key figures in the ball world, many of whom contribute monologues that shed light on the ball culture as well as on their own personalities. In the film, titles such as \"house,\" \"mother,\" and \"reading\" emphasize how the subculture the film depicts has taken words from the straight and white worlds, and imbued them with alternate meanings, just as the \"houses\" serve as surrogate families for young ball-walkers whose sexual orientations have sometimes made acceptance and love within their own families hard to come by.",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "hotpot_5a7fb4495542994857a767c6",
+    "question": "Ten little Niggers, in American reprints and adaptations were all retitled \"And Then There Were None\", after the last five words in the nursery rhyme that has a roud folk song index number of what?",
+    "ground_truth": "13512",
+    "category": "hard",
+    "source": "hotpotqa"
+  },
+  {
+    "id": "nq_77289",
+    "question": "freedom for the pike is death for the minnows meaning",
+    "ground_truth": "Negative liberty \"It follows that a frontier must be drawn between the area of private life and that of public authority. Where it is to be drawn is a matter of argument, indeed of haggling. Men are largely interdependent, and no man's activity is so completely private as never to obstruct the lives of others in any way. 'Freedom for the pike is death for the minnows'; the liberty of some must depend on the restraint of others.\"[3]",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_89919",
+    "question": "when do booth and brennan sleep together for the first time",
+    "ground_truth": "Temperance \"Bones\" Brennan In episode 22 of season 6, \"The Hole in the Heart\", which saw the death of Vincent Nigel-Murray (Brennan's favorite intern) at the hands of renegade sniper Jacob Broadsky, Booth has Brennan stay at his apartment for her safety. Later that night, Brennan, still overcome with shock and grief over Vincent's death, goes into Booth's bedroom and they talk about the events of that day, and then allows Booth to hold her in bed. It is implied in the following day that they had sex. In the last scene of the season 6 finale, \"The Change in the Game\", after the birth of Angela and Hodgins' son, Brennan tells Booth that she is pregnant and that he is the father.",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "nq_55513",
+    "question": "when were the la brea tar pits discovered",
+    "ground_truth": "La Brea Tar Pits The Native American Chumash and Tongva people living in the area built boats unlike any others in North America prior to contact by settlers. Pulling fallen Northern California redwood trunks and pieces of driftwood from the Santa Barbara Channel, their ancestors learned to seal the cracks between the boards of the large wooden plank canoes by using the natural resource of tar. This innovative form of transportation allowed access up and down the coastline and to the Channel Islands.",
+    "category": "easy",
+    "source": "naturalquestions"
+  },
+  {
+    "id": "hotpot_5a7dbd5d5542997cc2c4748d",
+    "question": "Liturgy of St. John Chrysostom is a musical work by Sergie Rechmaninoff, the other being a work that premiered in what city?",
+    "ground_truth": "Moscow",
+    "category": "hard",
+    "source": "hotpotqa"
+  }
+]

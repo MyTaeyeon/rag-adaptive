@@ -1,0 +1,9 @@
+{
+  "total_normalized": 190770,
+  "counts": {
+    "hard": 90539,
+    "easy": 100231
+  },
+  "sample_size": 100,
+  "sample_path": "samples\\dataset_sample_100.json"
+}
