@@ -14,7 +14,7 @@ pip install -r requirements.txt
 ```bash
 python run_backend.py
 ```
-Backend sẽ chạy tại `http://localhost:8000`
+Backend sẽ chạy tại `http://localhost:5555`
 
 **Frontend (Streamlit):**
 ```bash
@@ -26,7 +26,13 @@ Frontend sẽ tự động mở trong trình duyệt
 
 ## Project Overview
 
-Adaptive RAG (Retrieval-Augmented Generation) System là một hệ thống RAG thông minh với khả năng tự động điều chỉnh số lượng tài liệu cần truy xuất dựa trên đặc điểm của câu truy vấn. Hệ thống sử dụng pipeline hybrid retrieval kết hợp giữa sparse retrieval (BM25) và dense retrieval (semantic embeddings) để đạt được độ chính xác cao trong việc tìm kiếm tài liệu liên quan.
+Adaptive RAG là hệ thống RAG tự điều chỉnh k dựa trên entropy, kết hợp hybrid retrieval (BM25 + dense) và reranking để trả lời chính xác, đa ngôn ngữ.
+
+### Đặc điểm chính (ngắn gọn)
+- **Adaptive K theo entropy**: Quyết định k dựa trên entropy của LLM (không cần context), phản ánh độ khó câu hỏi.
+- **Hybrid retrieval + RRF**: BM25 (sparse) + semantic embeddings (dense) và hợp nhất bằng Reciprocal Rank Fusion.
+- **Model theo ngôn ngữ**: Chọn embedding/reranker phù hợp EN/VI; answer generation hỗ trợ OpenAI GPT-4o hoặc Gemini 2.5 Flash Lite.
+- **Prompt + logging**: System prompt tối ưu (thân thiện, đúng trọng tâm, không icon) và log đầy đủ prompt/answer để debug.
 
 ## RAG Pipeline
 
@@ -39,12 +45,14 @@ Sử dụng **GPT-4o** để viết lại và mở rộng câu truy vấn của 
 - Làm rõ ý định nếu truy vấn mơ hồ
 
 ### 2. Adaptive K Selection
-Tự động xác định số lượng tài liệu cần truy xuất (k) dựa trên:
-- Độ dài câu truy vấn (số tokens)
-- Entropy (độ đa dạng từ vựng)
-- Độ phức tạp của câu hỏi
 
-Hệ thống sử dụng heuristic algorithm để điều chỉnh k trong khoảng từ k_min đến k_max, đảm bảo truy xuất đủ tài liệu cho các câu hỏi phức tạp nhưng không lãng phí tài nguyên cho câu hỏi đơn giản.
+- **Cách làm**: Dùng entropy của LLM (không có context) để đo uncertainty, average qua n lần gọi (mặc định n=5), sau đó map tuyến tính về k (clamp trong [k_min, k_max]).
+- **Giải thích**: Entropy cao → câu hỏi khó → tăng k; entropy thấp → câu hỏi đơn giản → giảm k.
+- **Kết quả tuning (tóm tắt)**:
+  - Full Token n=1: Baseline, EN tốt, VI nhiễu, stability thấp.
+  - First N Tokens n=1: Không cải thiện, bỏ.
+  - Full Token n=5: Stability cao, entropy std ~0, phân tách độ khó rõ ràng cho EN/VI → **phương pháp production**.
+  - Entropy tương quan tuyến tính với độ khó (easy ~0.19-0.25, medium ~0.25-0.30, hard ~0.30-0.40); n=5 giảm noise/outliers rõ rệt.
 
 ### 3. Hybrid Retrieval
 Kết hợp hai phương pháp retrieval để tận dụng ưu điểm của cả hai:
@@ -66,10 +74,10 @@ Kết quả từ hai phương pháp được kết hợp bằng **Reciprocal Ran
 Sử dụng **Cross-Encoder reranker (cross-encoder/ms-marco-MiniLM-L-12-v2)** để đánh giá lại độ liên quan của các tài liệu đã được retrieve. Cross-Encoder xử lý query-document pair cùng lúc, cho độ chính xác cao hơn so với cosine similarity đơn thuần. Model này hỗ trợ tốt cả tiếng Anh và tiếng Việt.
 
 ### 5. Answer Generation
-Sử dụng **GPT-4o** để sinh câu trả lời dựa trên các tài liệu đã được retrieve và rerank. LLM được hướng dẫn:
-- Chỉ sử dụng thông tin từ các tài liệu được cung cấp
-- Trích dẫn nguồn tài liệu khi có thể
-- Trả lời tự nhiên và dễ hiểu
+
+- **Providers**: OpenAI GPT-4o hoặc Google Gemini 2.5 Flash Lite (mặc định chọn Gemini Flash Lite để tối ưu tốc độ).
+- **System prompt**: Tối ưu để trả lời thân thiện, đúng trọng tâm, không icon/emoji, dùng Markdown rõ ràng, hỗ trợ EN/VI, hiểu bối cảnh Adaptive RAG (có hoặc không có context).
+- **Logging**: Mỗi lần generate được lưu `logs/generation_<timestamp>.json` (prompt, answer, provider/model, error nếu có) để debug nhanh.
 
 ## AI Models & Technologies
 
@@ -83,26 +91,40 @@ Hệ thống sử dụng **language-aware model selection** để tự động c
 | **Dense Embedding** | all-mpnet-base-v2 | vietnamese-sbert-v2 | Model chuyên biệt cho từng ngôn ngữ đảm bảo hiệu suất tối ưu |
 | **Semantic Chunking** | all-mpnet-base-v2 | vietnamese-sbert-v2 | Dùng chung với embedding model để đảm bảo consistency |
 | **Reranker** | ms-marco-L-12-v2 | ms-marco-L-12-v2 | Multilingual model với chất lượng cao cho cả hai ngôn ngữ |
-| **Answer Generation** | GPT-4o | GPT-4o | GPT-4o sinh câu trả lời tự nhiên và chính xác cho cả hai ngôn ngữ |
+| **Answer Generation** | GPT-4o / Gemini 2.5 Flash Lite | GPT-4o / Gemini 2.5 Flash Lite | GPT-4o và Gemini đều hỗ trợ tốt cả hai ngôn ngữ. Gemini Flash Lite được ưu tiên cho tốc độ |
 | **Sparse Retrieval** | BM25 | BM25 | BM25 hoạt động tốt cho cả hai ngôn ngữ với normalization phù hợp |
 
 ### Large Language Models (LLMs)
 
 **GPT-4o (OpenAI)**
-- **Sử dụng**: Query rewriting và answer generation cho cả tiếng Anh và tiếng Việt
+- **Sử dụng**: Query rewriting và answer generation (optional) cho cả tiếng Anh và tiếng Việt
 - **Query Rewriting**: 
   - Temperature: 0.3 (focused, deterministic)
   - Max tokens: 200
   - Mục đích: Viết lại và mở rộng câu hỏi để cải thiện retrieval
-- **Answer Generation**:
+- **Answer Generation** (khi được chọn):
   - Temperature: 0.7 (balanced creativity and accuracy)
-  - Max tokens: 1000
+  - Max tokens: 50000
   - Mục đích: Sinh câu trả lời dựa trên context đã retrieve
 
 **Ưu điểm**:
 - Hỗ trợ đa ngôn ngữ xuất sắc, đặc biệt là tiếng Việt
 - Hiểu ngữ cảnh và ngữ nghĩa tốt
 - Sinh văn bản tự nhiên và chính xác
+- Hỗ trợ logprobs cho entropy calculation
+
+**Google Gemini 2.5 Flash Lite**
+- **Sử dụng**: Answer generation (mặc định) cho cả tiếng Anh và tiếng Việt
+- **Answer Generation**:
+  - Temperature: 0.7 (balanced creativity and accuracy)
+  - Max tokens: 50000
+  - Model: gemini-2.5-flash-lite
+
+**Ưu điểm**:
+- Tốc độ nhanh hơn đáng kể so với GPT-4o
+- Chất lượng câu trả lời tốt với system prompts được tối ưu
+- Chi phí thấp hơn
+- Hỗ trợ tốt cả tiếng Anh và tiếng Việt
 
 ### Embedding Models
 
@@ -237,8 +259,24 @@ Hệ thống sử dụng **semantic chunking** thay vì fixed-size chunking đ�
 ## Configuration
 
 Tất cả các tham số có thể được cấu hình trong `backend/config/config.py`, bao gồm:
-- Model names và parameters
-- Chunking thresholds và sizes
-- Adaptive k selection ranges
+- Model names và parameters (LLM, embeddings, reranker)
+- Chunking thresholds và sizes (language-specific)
+- Adaptive k selection ranges (k_min, k_max, entropy_max)
+- Number of iterations (n) cho entropy calculation (default: 5)
 - Temperature và max_tokens cho LLM
 - Reranker và fusion parameters
+- Answer generation provider (OpenAI hoặc Gemini)
+
+## Hyperparameter Tuning (tóm tắt)
+
+- **Mục tiêu**: Tìm cách tính entropy ổn định, tương quan với độ khó câu hỏi, và tối ưu n (số iterations).
+- **Dataset**: 101 queries/nguồn ngữ (EN/VI), phân loại easy/medium/hard, nhiều loại câu hỏi (factual, analytical, reasoning).
+- **Phương pháp so sánh**:
+  - Full Token n=1: Baseline, EN ổn, VI nhiễu, stability thấp.
+  - First N Tokens n=1: Không cải thiện, loại bỏ.
+  - Full Token n=5: Stability cao, entropy std ~0, phân tách độ khó rõ ràng (EN/VI) → **chọn cho production**.
+- **Kết luận chính**:
+  - Entropy tăng tuyến tính với độ khó (easy ~0.19-0.25, hard ~0.30-0.40).
+  - Tăng n (5) giảm noise/outliers rõ rệt, curve mượt, đáng tin cậy hơn.
+  - Trade-off chi phí API 5x nhưng mang lại stability cao, phù hợp production.
+- Chi tiết, số liệu và notebook: xem `hyperparam_tuning/` (các README và CSV kèm theo).

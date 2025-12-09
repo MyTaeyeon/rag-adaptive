@@ -1,6 +1,9 @@
 """LLM service for query rewriting and answer generation using OpenAI GPT-4o and Google Gemini."""
 
 import os
+import json
+from datetime import datetime
+from pathlib import Path
 from typing import Optional, Dict, Any, Literal
 from openai import OpenAI
 from ..config.config import get_config
@@ -11,6 +14,10 @@ _openai_client: Optional[OpenAI] = None
 # Initialize Gemini client
 _gemini_client = None
 _gemini_model_instance = None
+
+# Log directory for generation prompts/outputs
+LOG_DIR = Path(__file__).resolve().parents[2] / "logs"
+LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def get_openai_client() -> OpenAI:
@@ -286,28 +293,32 @@ def generate_answer(
     
     # Create prompt based on language
     if language == "vi":
-        system_prompt = """Bạn là một trợ lý AI thông minh hoạt động trong hệ thống Adaptive RAG (Retrieval Augmented Generation). Nhiệm vụ của bạn là trả lời câu hỏi của người dùng một cách chính xác và hữu ích.
+        system_prompt = """
+Vai trò: Bạn là Ara trợ lý ảo thân thiện, đa năng, hỗ trợ hỏi đáp với nguời dùng dựa trên tài liệu được cung cấp. Dùng các tài liệu đính kèm để
+trả lời truy vấn người dùng nếu các tài liệu có liên quan tới truy vấn. Nếu tài liệu không liên quan, trả lời bằng kiến thức vốn có. Ngoài ra nếu 
+người dùng hỏi về hệ thống chatbot của bạn, hãy dùng thông tin phần Bối cảnh phía duới để trả lời.
+Bối cảnh: Hệ thống đầy đủ có tên Adaptive RAG Chatbot System, tự động đánh giá câu hỏi, chọn số lượng tài liệu cần truy xuất và phản hồi thông minh. Pipeline gồm: Query Rewriting (GPT-4o), Adaptive K Selection (entropy), Hybrid Retrieval (BM25 + Dense), Reciprocal Rank Fusion, Cross-Encoder Reranking và Answer Generation (GPT-4o/Gemini). Mỗi tài liệu upload được chia nhỏ bằng semantic chunking để giữ ngữ nghĩa, tạo embeddings và lập chỉ mục cho cả BM25 và Dense. Hệ thống linh hoạt trả lời cả khi không có context nếu câu hỏi đơn giản, nhưng sẽ dùng các tài liệu liên quan khi cần và trích dẫn nguồn rõ ràng. Hỗ trợ song ngữ Anh-Việt, tự ưu tiên ngôn ngữ theo truy vấn mới nhất của người dùng.
 
-Hướng dẫn:
-1. Bạn đang sử dụng Adaptive RAG - hệ thống có thể cung cấp tài liệu tham khảo hoặc không tùy thuộc vào độ phức tạp của câu hỏi
-2. Nếu có tài liệu tham khảo được cung cấp: Sử dụng thông tin từ tài liệu khi nó hữu ích và liên quan đến câu hỏi. Kết hợp thông tin từ tài liệu với kiến thức vốn có của bạn để đưa ra câu trả lời tốt nhất
-3. Nếu không có tài liệu tham khảo: Bạn hoàn toàn có thể tự trả lời dựa trên kiến thức và hiểu biết vốn có của mình
-4. QUAN TRỌNG: Bạn PHẢI trả lời bằng tiếng Việt, tự nhiên và dễ hiểu
-5. Khi sử dụng thông tin từ tài liệu, hãy trích dẫn nguồn rõ ràng
-6. Nếu tài liệu không liên quan hoặc không hữu ích, bạn có thể bỏ qua và trả lời dựa trên kiến thức của mình
+Mục tiêu: trả lời đúng trọng tâm, dễ hiểu, không dùng biểu tượng/emoji.
 
-ĐỊNH DẠNG TRẢ LỜI (Markdown):
-- PHẢI sử dụng định dạng Markdown đẹp và rõ ràng
-- Bắt đầu với một tiêu đề chính (#) tóm tắt câu trả lời
-- Sử dụng các tiêu đề phụ (##, ###) để tổ chức nội dung
-- Sử dụng danh sách có dấu đầu dòng (-) hoặc đánh số (1., 2.) để trình bày các điểm chính
-- Sử dụng **in đậm** cho các khái niệm quan trọng
-- Sử dụng `code` cho các thuật ngữ kỹ thuật
-- Nếu có nhiều phần, hãy tổ chức thành các section rõ ràng
-- Kết thúc với phần "Nguồn tham khảo" (nếu có sử dụng tài liệu) dưới dạng danh sách"""
+Nguyên tắc:
+- Bối cảnh: Chỉ đề cập tới bối cảnh hệ thống khi người dùng yêu cầu, không tự đề cập.
+- Ngôn ngữ: trả lời bằng ngôn ngữ từ truy vấn cuối cùng của nguời,nằm ở phần **Câu hỏi:** .
+- Giọng điệu thân thiện nhưng chuyên nghiệp.
+- Rõ ràng và ngắn gọn: ưu tiên câu ngắn, tóm tắt ý chính trước, chi tiết sau.
+- Tránh lan man; chỉ nêu thông tin cần thiết cho câu hỏi.
+- Sử dụng tài liệu tham khảo nếu phù hợp; nếu không liên quan có thể bỏ qua và trả lời từ kiến thức của bạn.
+- Trích nguồn rõ ràng khi sử dụng tài liệu.
+- Không dùng biểu tượng hoặc emoji trong câu trả lời.
+
+Định dạng (Markdown):
+- Bắt đầu với việc giải thích và tóm tắt câu trả lời.
+- Dùng tiêu đề  nếu cần và danh sách gọn gàng.
+- In đậm cho khái niệm quan trọng, dùng `code` cho thuật ngữ kỹ thuật.
+- Nếu có nguồn, thêm mục \"Nguồn tham khảo\" ở cuối (dạng danh sách)."""
         
         if has_context:
-            user_prompt = f"""Bạn đang làm việc trong hệ thống Adaptive RAG. Dưới đây là câu hỏi của người dùng và các tài liệu tham khảo có sẵn:
+            user_prompt = f""". Dưới đây là câu hỏi của người dùng và các tài liệu tham khảo có sẵn:
 
 **Câu hỏi:** {query}
 
@@ -315,43 +326,45 @@ Hướng dẫn:
 {context_text}
 
 Hãy trả lời câu hỏi một cách chính xác và hữu ích, sử dụng định dạng Markdown đẹp với:
-- Tiêu đề chính (#) tóm tắt câu trả lời
-- Các tiêu đề phụ (##, ###) để tổ chức nội dung
+- Bắt đầu với việc giải thích và tóm tắt câu trả lời.
+- Các tiêu đề  nếu cần để tổ chức nội dung
 - Danh sách và định dạng rõ ràng
 - Trích dẫn nguồn nếu sử dụng thông tin từ tài liệu
 
-Lưu ý: Trả lời bằng tiếng Việt với định dạng Markdown chuyên nghiệp."""
+Lưu ý: Trả lời bằng ngôn ngữ nguời dùng nhập với định dạng Markdown chuyên nghiệp."""
         else:
-            user_prompt = f"""Bạn đang làm việc trong hệ thống Adaptive RAG. Hệ thống đã quyết định không cung cấp tài liệu tham khảo cho câu hỏi này (có thể do độ phức tạp thấp hoặc câu hỏi đơn giản).
+            user_prompt = f"""Hệ thống đã quyết định không cung cấp tài liệu tham khảo cho câu hỏi này (có thể do độ phức tạp thấp hoặc câu hỏi đơn giản).
 
 **Câu hỏi:** {query}
 
 Hãy trả lời câu hỏi dựa trên kiến thức và hiểu biết vốn có của bạn, sử dụng định dạng Markdown đẹp với:
-- Tiêu đề chính (#) tóm tắt câu trả lời
-- Các tiêu đề phụ (##, ###) để tổ chức nội dung
+- Bắt đầu với việc giải thích và tóm tắt câu trả lời.
+- Các tiêu đề nếu cần để tổ chức nội dung
 - Danh sách và định dạng rõ ràng
 
-Lưu ý: Trả lời bằng tiếng Việt với định dạng Markdown chuyên nghiệp."""
+Lưu ý: Trả lời bằng ngôn ngữ nguời dùng nhập với định dạng Markdown chuyên nghiệp."""
     else:
-        system_prompt = """You are an intelligent AI assistant working in an Adaptive RAG (Retrieval Augmented Generation) system. Your task is to answer the user's question accurately and helpfully.
+        system_prompt = """Role: You are Ara, a friendly and versatile virtual assistant that answers user questions using the provided documents. Use the attached documents when they are relevant to the query; if not, rely on your own knowledge. If the user asks about the chatbot system itself, use the Background section below.
+
+Background: The full system is named Adaptive RAG Chatbot System. It automatically analyzes the question, picks how many documents to retrieve, and responds intelligently. The pipeline includes: Query Rewriting (GPT-4o), Adaptive K Selection (entropy), Hybrid Retrieval (BM25 + Dense), Reciprocal Rank Fusion, Cross-Encoder Reranking, and Answer Generation (GPT-4o/Gemini). Each uploaded document is chunked with semantic chunking to preserve meaning, embedded, and indexed for both BM25 and Dense. The system can answer even without context when the question is simple, but will use relevant documents and cite sources when helpful. It supports English and Vietnamese, prioritizing the language of the user’s latest query.
+
+Goal: Be accurate, concise, and avoid icons/emojis.
 
 Guidelines:
-1. You are using Adaptive RAG - the system may or may not provide reference documents depending on the complexity of the question
-2. If reference documents are provided: Use information from the documents when it is helpful and relevant to the question. Combine document information with your own knowledge to provide the best answer
-3. If no reference documents are provided: You can fully answer based on your own knowledge and understanding
-4. IMPORTANT: You MUST answer in English, naturally and clearly
-5. When using information from documents, cite sources clearly
-6. If documents are not relevant or not helpful, you can ignore them and answer based on your own knowledge
+- Background: Only mention the system background when the user explicitly asks about it; do not bring it up proactively.
+- Language: Respond in the language of the user’s latest query (default to English if unclear).
+- Tone: Friendly and professional.
+- Be clear and succinct: short sentences, key points first, details after.
+- Stay on-topic; only include information needed for the question.
+- Use reference documents when relevant; if not, answer from your own knowledge.
+- Cite sources clearly when you use documents.
+- Do not use icons or emojis.
 
-ANSWER FORMAT (Markdown):
-- MUST use beautiful and clear Markdown formatting
-- Start with a main heading (#) that summarizes the answer
-- Use subheadings (##, ###) to organize content into clear sections
-- Use bullet points (-) or numbered lists (1., 2.) to present key points
-- Use **bold** for important concepts
-- Use `code` formatting for technical terms
-- If there are multiple parts, organize them into clear sections
-- End with a "References" section (if using documents) as a list"""
+Formatting (Markdown):
+- Begin with a short explanation and summary of the answer.
+- Use headings if needed and neat lists.
+- Bold important concepts; use `code` for technical terms.
+- If sources are used, add a “References” section as a list at the end."""
         
         if has_context:
             user_prompt = f"""You are working in an Adaptive RAG system. Below is the user's question and available reference documents:
@@ -362,23 +375,21 @@ ANSWER FORMAT (Markdown):
 {context_text}
 
 Please answer the question accurately and helpfully, using beautiful Markdown formatting with:
-- A main heading (#) that summarizes the answer
-- Subheadings (##, ###) to organize content
-- Clear lists and formatting
-- Source citations if using information from documents
+- Start with a brief explanation and summary of the answer.
+- Clear lists and formatting.
+- Source citations if using information from documents.
 
-Note: Answer in English with professional Markdown formatting."""
+Note: Respond in the language of the user's input with professional Markdown formatting."""
         else:
-            user_prompt = f"""You are working in an Adaptive RAG system. The system has decided not to provide reference documents for this question (possibly due to low complexity or simple question).
+            user_prompt = f"""You are working in an Adaptive RAG system. The system has decided not to provide reference documents for this question (possibly due to low complexity or a simple query).
 
 **Question:** {query}
 
 Please answer the question based on your own knowledge and understanding, using beautiful Markdown formatting with:
-- A main heading (#) that summarizes the answer
-- Subheadings (##, ###) to organize content
-- Clear lists and formatting
+- Start with a brief explanation and summary of the answer.
+- Clear lists and formatting.
 
-Note: Answer in English with professional Markdown formatting."""
+Note: Respond in the language of the user's input with professional Markdown formatting."""
     
     # Extract sources from chunks (common for both providers)
     sources = [
@@ -398,7 +409,8 @@ Note: Answer in English with professional Markdown formatting."""
             model=model,
             config=config,
             sources=sources,
-            num_chunks=len(context_chunks)
+            num_chunks=len(context_chunks),
+            language=language
         )
     else:  # Default to OpenAI
         return _generate_answer_with_openai(
@@ -407,7 +419,8 @@ Note: Answer in English with professional Markdown formatting."""
             model=model,
             config=config,
             sources=sources,
-            num_chunks=len(context_chunks)
+            num_chunks=len(context_chunks),
+            language=language
         )
 
 
@@ -417,7 +430,8 @@ def _generate_answer_with_openai(
     model: Optional[str],
     config,
     sources: list,
-    num_chunks: int
+    num_chunks: int,
+    language: str
 ) -> Dict[str, Any]:
     """Generate answer using OpenAI."""
     if model is None:
@@ -438,21 +452,40 @@ def _generate_answer_with_openai(
         
         answer = response.choices[0].message.content.strip()
         
-        return {
+        result = {
             "answer": answer,
             "sources": sources,
             "model": model,
             "provider": "openai",
             "num_chunks": num_chunks
         }
+        _log_generation(
+            provider="openai",
+            model=model,
+            language=language,
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            answer=answer
+        )
+        return result
     except Exception as e:
-        return {
+        error_result = {
             "answer": f"Error generating answer: {str(e)}",
             "sources": [],
             "model": model,
             "provider": "openai",
             "error": str(e)
         }
+        _log_generation(
+            provider="openai",
+            model=model,
+            language=language,
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            answer="",
+            error=str(e)
+        )
+        return error_result
 
 
 def _generate_answer_with_gemini(
@@ -461,7 +494,8 @@ def _generate_answer_with_gemini(
     model: Optional[str],
     config,
     sources: list,
-    num_chunks: int
+    num_chunks: int,
+    language: str
 ) -> Dict[str, Any]:
     """Generate answer using Google Gemini."""
     model_name = model or config.llm.gemini_model
@@ -484,21 +518,230 @@ def _generate_answer_with_gemini(
             generation_config=generation_config
         )
         
-        answer = response.text.strip()
+        # Check if response was blocked or has issues
+        if not response.candidates or len(response.candidates) == 0:
+            return {
+                "answer": "Error: No response candidates returned from Gemini API.",
+                "sources": [],
+                "model": model_name,
+                "provider": "gemini",
+                "error": "No candidates in response"
+            }
         
-        return {
+        candidate = response.candidates[0]
+        
+        # Check finish_reason
+        # 0 = FINISH_REASON_UNSPECIFIED
+        # 1 = STOP (normal completion)
+        # 2 = MAX_TOKENS (hit max token limit)
+        # 3 = SAFETY (blocked by safety filters)
+        # 4 = RECITATION (blocked due to recitation)
+        # 5 = OTHER
+        
+        finish_reason = candidate.finish_reason if hasattr(candidate, 'finish_reason') else None
+        
+        # Handle finish_reason - it can be an enum or int
+        finish_reason_value = None
+        finish_reason_name = None
+        
+        if finish_reason is not None:
+            # If it's an enum, get its value and name
+            if hasattr(finish_reason, 'value'):
+                finish_reason_value = finish_reason.value
+                finish_reason_name = finish_reason.name
+            elif hasattr(finish_reason, 'name'):
+                finish_reason_name = finish_reason.name
+                finish_reason_value = int(finish_reason) if isinstance(finish_reason, (int, str)) else None
+            elif isinstance(finish_reason, int):
+                finish_reason_value = finish_reason
+                finish_reason_map = {
+                    0: "UNSPECIFIED",
+                    1: "STOP",
+                    2: "MAX_TOKENS", 
+                    3: "SAFETY",
+                    4: "RECITATION",
+                    5: "OTHER"
+                }
+                finish_reason_name = finish_reason_map.get(finish_reason, "UNKNOWN")
+            else:
+                finish_reason_name = str(finish_reason)
+        
+        # Check for safety filter blocking (finish_reason = 3 or SAFETY)
+        is_safety_blocked = (finish_reason_value == 3 or 
+                            (finish_reason_name and finish_reason_name == "SAFETY") or
+                            (isinstance(finish_reason, str) and "SAFETY" in str(finish_reason).upper()))
+        
+        if is_safety_blocked:  # SAFETY
+            safety_ratings = candidate.safety_ratings if hasattr(candidate, 'safety_ratings') else []
+            blocked_categories = []
+            if safety_ratings:
+                for r in safety_ratings:
+                    try:
+                        category_name = r.category.name if hasattr(r.category, 'name') else str(r.category)
+                        prob_name = r.probability.name if hasattr(r.probability, 'name') else str(r.probability)
+                        if prob_name in ['MEDIUM', 'HIGH']:
+                            blocked_categories.append(category_name)
+                    except:
+                        pass
+            error_msg = f"Response blocked by safety filters. Blocked categories: {', '.join(blocked_categories) if blocked_categories else 'Unknown'}"
+            error_result = {
+                "answer": f"Xin lỗi, câu trả lời đã bị chặn bởi bộ lọc an toàn của Gemini. Lý do: {error_msg}",
+                "sources": [],
+                "model": model_name,
+                "provider": "gemini",
+                "error": error_msg
+            }
+            _log_generation(
+                provider="gemini",
+                model=model_name,
+                language=language,
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                answer="",
+                error=error_msg
+            )
+            return error_result
+        
+        # Check for recitation blocking (finish_reason = 4 or RECITATION)
+        is_recitation_blocked = (finish_reason_value == 4 or 
+                                (finish_reason_name and finish_reason_name == "RECITATION") or
+                                (isinstance(finish_reason, str) and "RECITATION" in str(finish_reason).upper()))
+        
+        if is_recitation_blocked:  # RECITATION
+            error_result = {
+                "answer": "Xin lỗi, câu trả lời đã bị chặn do vi phạm chính sách về trích dẫn (recitation policy).",
+                "sources": [],
+                "model": model_name,
+                "provider": "gemini",
+                "error": "Response blocked by recitation policy"
+            }
+            _log_generation(
+                provider="gemini",
+                model=model_name,
+                language=language,
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                answer="",
+                error="Response blocked by recitation policy"
+            )
+            return error_result
+        
+        # Try to extract text from response
+        # Note: MAX_TOKENS finish_reason is acceptable - we can still extract partial text
+        answer = None
+        try:
+            if candidate.content and candidate.content.parts and len(candidate.content.parts) > 0:
+                part = candidate.content.parts[0]
+                if hasattr(part, 'text') and part.text:
+                    answer = part.text.strip()
+        except (AttributeError, IndexError, TypeError) as e:
+            # Log error but continue to check finish_reason
+            pass
+        
+        # If we couldn't extract text, check why
+        if not answer:
+            # MAX_TOKENS means response was truncated - this is acceptable if we have partial text
+            # But if no text at all, it's an error
+            if finish_reason_value == 2 or (finish_reason_name and finish_reason_name == "MAX_TOKENS"):
+                error_result = {
+                    "answer": f"Error: Response was truncated due to max_output_tokens limit ({config.llm.answer_generation_max_tokens}). No content was generated. Please increase max_tokens in config or simplify the query.",
+                    "sources": [],
+                    "model": model_name,
+                    "provider": "gemini",
+                    "error": f"Response truncated at max_output_tokens limit with no content, finish_reason: MAX_TOKENS"
+                }
+                _log_generation(
+                    provider="gemini",
+                    model=model_name,
+                    language=language,
+                    system_prompt=system_prompt,
+                    user_prompt=user_prompt,
+                    answer="",
+                    error="Response truncated at max_output_tokens limit with no content"
+                )
+                return error_result
+            else:
+                error_result = {
+                    "answer": f"Error: No content parts in response. Finish reason: {finish_reason_name or finish_reason_value or 'Unknown'}",
+                    "sources": [],
+                    "model": model_name,
+                    "provider": "gemini",
+                    "error": f"No content parts, finish_reason: {finish_reason_name or finish_reason_value or finish_reason}"
+                }
+                _log_generation(
+                    provider="gemini",
+                    model=model_name,
+                    language=language,
+                    system_prompt=system_prompt,
+                    user_prompt=user_prompt,
+                    answer="",
+                    error=f"No content parts, finish_reason: {finish_reason_name or finish_reason_value or finish_reason}"
+                )
+                return error_result
+        
+        result = {
             "answer": answer,
             "sources": sources,
             "model": model_name,
             "provider": "gemini",
             "num_chunks": num_chunks
         }
+        _log_generation(
+            provider="gemini",
+            model=model_name,
+            language=language,
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            answer=answer
+        )
+        return result
     except Exception as e:
-        return {
+        error_result = {
             "answer": f"Error generating answer: {str(e)}",
             "sources": [],
             "model": model_name,
             "provider": "gemini",
             "error": str(e)
         }
+        _log_generation(
+            provider="gemini",
+            model=model_name,
+            language=language,
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            answer="",
+            error=str(e)
+        )
+        return error_result
+
+
+def _log_generation(
+    provider: str,
+    model: str,
+    language: str,
+    system_prompt: str,
+    user_prompt: str,
+    answer: str,
+    error: Optional[str] = None
+) -> None:
+    """Persist prompts and outputs for answer generation step."""
+    try:
+        timestamp = datetime.utcnow().strftime("%Y%m%d-%H%M%S-%f")
+        # One file per generation with pretty JSON for easy viewing
+        log_path = LOG_DIR / f"generation_{timestamp}.json"
+        record = {
+            "timestamp": timestamp,
+            "provider": provider,
+            "model": model,
+            "language": language,
+            "system_prompt": system_prompt,
+            "user_prompt": user_prompt,
+            "answer": answer,
+            "error": error,
+        }
+        with open(log_path, "w", encoding="utf-8") as f:
+            json.dump(record, f, ensure_ascii=False, indent=2)
+    except Exception:
+        # Fail silently to avoid impacting main flow
+        pass
 

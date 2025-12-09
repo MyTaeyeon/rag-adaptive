@@ -1,0 +1,102 @@
+sample_id,query,difficulty,entropy,entropy_std,n_iterations,num_tokens
+1,python là gì?,dễ,0.0007147453794177515,0.0,1,5
+2,git là gì?,dễ,0.051885075116561666,0.0,1,5
+3,ai là gì?,dễ,0.07739281116820308,0.0,1,5
+4,machine learning là gì?,dễ,0.10294007597565133,0.0,1,5
+5,deep learning là gì?,dễ,0.22757150833252995,0.0,1,5
+6,neural network là gì?,dễ,0.09727670142456415,0.0,1,5
+7,gan là gì?,dễ,0.018240053204386094,0.0,1,5
+8,transformer là gì?,dễ,0.11682655861638865,0.0,1,5
+9,cơ sở dữ liệu là gì?,dễ,7.11536589186807e-06,0.0,1,5
+10,thuật toán là gì?,dễ,0.001033492646071165,0.0,1,5
+11,java là gì?,dễ,0.00018220776811736595,0.0,1,5
+12,javascript là gì?,dễ,0.006805771919224208,0.0,1,5
+13,html là gì?,dễ,0.031048873612506123,0.0,1,5
+14,css là gì?,dễ,0.010416684194244538,0.0,1,5
+15,sql là gì?,dễ,0.00596613166866397,0.0,1,5
+16,api là gì?,dễ,0.10753471468958116,0.0,1,5
+17,json là gì?,dễ,0.0023809535817943383,0.0,1,5
+18,xml là gì?,dễ,0.034587261531275185,0.0,1,5
+19,http là gì?,dễ,0.24313093728558616,0.0,1,5
+20,https là gì?,dễ,0.17318049191258048,0.0,1,5
+21,tcp là gì?,dễ,0.020858838623443822,0.0,1,5
+22,ip là gì?,dễ,0.12888174323921003,0.0,1,5
+23,dns là gì?,dễ,0.06238237263768209,0.0,1,5
+24,cloud là gì?,dễ,0.30266720501881483,0.0,1,5
+25,docker là gì?,dễ,0.001836905019035659,0.0,1,5
+26,kubernetes là gì?,dễ,0.046666952974425455,0.0,1,5
+27,linux là gì?,dễ,0.0006036540021066226,0.0,1,5
+28,windows là gì?,dễ,0.01587539268408664,0.0,1,5
+29,macos là gì?,dễ,0.001474424784889236,0.0,1,5
+30,ios là gì?,dễ,0.0005030813672377075,0.0,1,5
+31,android là gì?,dễ,0.02891479799745549,0.0,1,5
+32,html5 là gì?,dễ,0.00019827358219360783,0.0,1,5
+33,css3 là gì?,dễ,0.0026964931777451765,0.0,1,5
+34,react là gì?,dễ,0.00408749862179534,0.0,1,5
+35,so sánh machine learning và deep learning,trung_bình,0.07268800980246658,0.0,1,5
+36,khác biệt giữa cnn và rnn,trung_bình,0.15452899328840106,0.0,1,5
+37,khi nào nên dùng reinforcement learning,trung_bình,0.35854854255378854,0.0,1,5
+38,ưu nhược điểm của transformer architecture,trung_bình,0.24190226240979723,0.0,1,5
+39,cách hoạt động của attention mechanism,trung_bình,0.24749987392686013,0.0,1,5
+40,gradient descent hoạt động như thế nào,trung_bình,0.03527237556206857,0.0,1,5
+41,overfitting là gì và cách khắc phục,trung_bình,0.04687863870551737,0.0,1,5
+42,khác biệt giữa supervised và unsupervised learning,trung_bình,0.08550099614616247,0.0,1,5
+43,backpropagation hoạt động như thế nào,trung_bình,0.07994206390022104,0.0,1,5
+44,activation function trong neural network là gì,trung_bình,0.2711800512950483,0.0,1,5
+45,khác biệt giữa classification và regression,trung_bình,0.10932105086293269,0.0,1,5
+46,giải thích cross-validation,trung_bình,0.020478166777350242,0.0,1,5
+47,regularization trong machine learning là gì,trung_bình,0.02253302958017515,0.0,1,5
+48,khác biệt giữa batch và stochastic gradient descent,trung_bình,0.17252933641467252,0.0,1,5
+49,dropout hoạt động như thế nào,trung_bình,0.0045247647940814175,0.0,1,5
+50,giải thích batch normalization,trung_bình,0.11287381035942938,0.0,1,5
+51,transfer learning là gì,trung_bình,0.2452243190983104,0.0,1,5
+52,khác biệt giữa rnn và lstm,trung_bình,0.07420390829239705,0.0,1,5
+53,convolutional layer hoạt động như thế nào,trung_bình,0.3401718864785859,0.0,1,5
+54,giải thích pooling trong cnn,trung_bình,0.060629855399511566,0.0,1,5
+55,data augmentation là gì,trung_bình,0.23292797598474263,0.0,1,5
+56,khác biệt giữa precision và recall,trung_bình,0.055476723294985285,0.0,1,5
+57,giải thích f1 score,trung_bình,0.07733569067555184,0.0,1,5
+58,confusion matrix là gì,trung_bình,0.21685916250614587,0.0,1,5
+59,k-means clustering hoạt động như thế nào,trung_bình,0.09334928180637633,0.0,1,5
+60,khác biệt giữa random forest và gradient boosting,trung_bình,0.07959597976048016,0.0,1,5
+61,giải thích feature selection,trung_bình,0.20299805883673297,0.0,1,5
+62,dimensionality reduction là gì,trung_bình,0.0901815813401933,0.0,1,5
+63,khác biệt giữa svm và logistic regression,trung_bình,0.11362486771192208,0.0,1,5
+64,ensemble learning hoạt động như thế nào,trung_bình,0.06514525073214153,0.0,1,5
+65,giải thích bias-variance tradeoff,trung_bình,0.00872494956116101,0.0,1,5
+66,early stopping là gì,trung_bình,0.01906501248125791,0.0,1,5
+67,khác biệt giữa validation và test set,trung_bình,0.030796685943177464,0.0,1,5
+68,hyperparameter tuning hoạt động như thế nào,trung_bình,0.029755766508035148,0.0,1,5
+69,thiết kế một mô hình deep learning để xử lý văn bản đa ngôn ngữ có dấu,khó,0.0863061042923002,0.0,1,5
+70,phân tích trade-off giữa model complexity và generalization trong transformer,khó,0.4979723149619802,0.0,1,5
+71,giải thích chi tiết về backpropagation trong neural network nhiều lớp có skip connections,khó,0.2076775435727566,0.0,1,5
+72,"so sánh các kiến trúc GAN hiện đại: StyleGAN, BigGAN, và Progressive GAN cùng trade-offs",khó,0.17764346799215622,0.0,1,5
+73,làm thế nào để optimize training của large language model với limited computational resources,khó,0.008865757853810576,0.0,1,5
+74,phân tích các kỹ thuật regularization trong deep learning và khi nào dùng technique nào,khó,0.41352767912971966,0.0,1,5
+75,thiết kế transformer architecture tối ưu cho ngôn ngữ low-resource,khó,0.36202888366854513,0.0,1,5
+76,giải thích nền tảng toán học của self-attention mechanism trong transformer,khó,0.3901011111752667,0.0,1,5
+77,"so sánh các thuật toán optimization: Adam, SGD, và RMSprop cùng trade-offs và use cases",khó,0.5023155577807008,0.0,1,5
+78,"phân tích mối quan hệ giữa batch size, learning rate và training stability trong deep learning",khó,0.14720396525758037,0.0,1,5
+79,thiết kế một hệ thống end-to-end cho real-time object detection sử dụng deep learning,khó,0.20872895751779014,0.0,1,5
+80,giải thích cách xử lý class imbalance trong multi-class classification problems,khó,0.31620172234204846,0.0,1,5
+81,phân tích tác động của các loss functions khác nhau lên training convergence và model performance,khó,0.4667262349798752,0.0,1,5
+82,thiết kế một chiến lược neural architecture search cho automated model design,khó,0.26373134751207034,0.0,1,5
+83,giải thích các nguyên tắc toán học đằng sau variational autoencoders,khó,0.02024605488248664,0.0,1,5
+84,"so sánh các approaches khác nhau cho sequence-to-sequence learning: attention, transformers, và CNNs",khó,0.5788996135978615,0.0,1,5
+85,phân tích các challenges và solutions cho training deep neural networks trên small datasets,khó,0.1699249465554295,0.0,1,5
+86,giải thích cách implement gradient clipping để prevent exploding gradients trong RNNs,khó,0.18504792718574742,0.0,1,5
+87,thiết kế một multi-task learning framework chia sẻ knowledge giữa các related tasks,khó,0.15210436652403622,0.0,1,5
+88,phân tích các theoretical guarantees và limitations của các deep learning architectures khác nhau,khó,0.4792029298116902,0.0,1,5
+89,giải thích cách sử dụng knowledge distillation để compress large models thành smaller ones,khó,0.10967848245929626,0.0,1,5
+90,so sánh các approaches khác nhau để xử lý missing data trong deep learning pipelines,khó,0.565383011186005,0.0,1,5
+91,phân tích vai trò của các activation functions khác nhau trong addressing vanishing gradient problem,khó,0.5446648513341925,0.0,1,5
+92,thiết kế một federated learning system cho training models trên distributed data sources,khó,0.24078121875891897,0.0,1,5
+93,giải thích cách implement curriculum learning để improve model training,khó,0.16831938532164611,0.0,1,5
+94,so sánh các strategies khác nhau để xử lý imbalanced datasets trong deep learning,khó,0.24188656851551862,0.0,1,5
+95,phân tích tác động của các normalization techniques khác nhau lên model performance,khó,0.31443795347130205,0.0,1,5
+96,thiết kế một system cho online learning adapt với changing data distributions,khó,0.2550762347854405,0.0,1,5
+97,giải thích nền tảng toán học của generative adversarial networks,khó,0.008874611902245788,0.0,1,5
+98,phân tích trade-offs giữa model interpretability và performance trong deep learning,khó,0.23044087474806724,0.0,1,5
+99,thiết kế một neural architecture có thể xử lý cả image và text inputs đồng thời,khó,0.1717186406733607,0.0,1,5
+100,giải thích cách implement continual learning để prevent catastrophic forgetting,khó,0.27661075326700174,0.0,1,5
+101,"so sánh các approaches khác nhau cho model compression: pruning, quantization, và distillation",khó,0.5538124682905785,0.0,1,5

@@ -50,9 +50,9 @@ class LLMConfig:
     answer_generation_provider: str = "openai"
     # Gemini model configuration (only used if answer_generation_provider == "gemini")
     # Model name for Gemini
-    # Common options: "gemini-2.0-flash-exp", "gemini-1.5-flash", "gemini-2.5-flash", etc.
+    # Common options: "gemini-2.5-flash", 
     # Set to your preferred model name
-    gemini_model: str = "gemini-2.5-flash"
+    gemini_model: str = "gemini-2.5-flash-lite"
     
     # Gemini API Key (read from GEMINI_API_KEY env var)
     # Will be loaded from environment variable
@@ -77,7 +77,7 @@ class LLMConfig:
     # Maximum tokens for answer generation
     # Adjust based on expected answer length
     # 1000 tokens ≈ 750 words
-    answer_generation_max_tokens: int = 1000
+    answer_generation_max_tokens: int = 50000
 
 
 @dataclass
@@ -198,7 +198,7 @@ class AdaptiveConfig:
     
     # Maximum K Value
     # Maximum number of documents to retrieve
-    k_max: int = 20
+    k_max: int = 10
     
     # Default number of iterations (n)
     # Number of non-hop LLM calls to calculate entropy
@@ -238,7 +238,7 @@ class AdaptiveConfig:
     # Typical range: 0.2-0.5 bits/token for GPT models
     # Lower values: System will retrieve more documents (more conservative)
     # Higher values: System will retrieve fewer documents (more aggressive)
-    entropy_max: float = 10
+    entropy_max: float = 0.5
 
 
 @dataclass

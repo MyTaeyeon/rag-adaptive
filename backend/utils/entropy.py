@@ -45,12 +45,14 @@ def entropy_to_k(average_entropy: float, k_min: int, k_max: int, entropy_max: fl
     Returns:
         Số documents cần retrieve (k)
     """
-    # Normalize entropy (giả sử entropy range 0-entropy_max bits/token)
-    # Có thể điều chỉnh entropy_max dựa trên thực tế
-    normalized_entropy = min(average_entropy / entropy_max, 1.0)
-    
-    # Linear mapping: entropy thấp → k_min, entropy cao → k_max
+    # Quy tắc ngưỡng: rất chắc chắn → k_min; rất không chắc → k_max
+    if average_entropy <= 0.2:
+        return k_min
+    if average_entropy >= 0.4:
+        return k_max
+
+    # Linear mapping trong vùng chuyển tiếp [0.2, 0.4]
+    normalized_entropy = (average_entropy - 0.2) / 0.2  # map 0.2->0, 0.4->1
     k = int(k_min + normalized_entropy * (k_max - k_min))
-    
     return max(k_min, min(k_max, k))
 

@@ -47,7 +47,7 @@ Adaptive RAG (Retrieval-Augmented Generation) System là một hệ thống RAG 
 [Cross-Encoder Reranking]
      |
      v
-[Answer Generation] (GPT-4o)
+[Answer Generation] (GPT-4o / Gemini Flash Lite)
      |
      v
 [Response to User]
@@ -373,26 +373,18 @@ Adaptive RAG (Retrieval-Augmented Generation) System là một hệ thống RAG 
 **Functions:**
 
 - `rewrite_query(original_query, language, model)`:
-  - Sử dụng GPT-4o để rewrite query
-  - Language-specific prompts (EN/VI)
-  - Temperature: 0.3 (focused)
-  - Max tokens: 200
-  - Trả về rewritten query
+  - GPT-4o, prompts riêng cho EN/VI
+  - Temperature: 0.3, Max tokens: 200
 
 - `generate_with_logprobs(query, style_prompt, language, model, temperature, max_tokens)`:
-  - Generate response với logprobs
-  - Sử dụng cho adaptive controller (non-hop calls)
-  - Temperature: 0.01 (very deterministic)
-  - Max tokens: 64
-  - Trả về output và logprobs
+  - Non-hop call cho adaptive controller, lấy logprobs để tính entropy
+  - Temperature: 0.01, Max tokens: 64
 
-- `generate_answer(query, context_chunks, language, model)`:
-  - Sinh câu trả lời từ retrieved context
-  - Adaptive RAG: Có thể trả lời không cần context
-  - Language-specific prompts
-  - Temperature: 0.7 (balanced)
-  - Max tokens: 1000
-  - Trả về answer và sources
+- `generate_answer(query, context_chunks, language, model, provider)`:
+  - Answer generation với OpenAI GPT-4o hoặc Google Gemini 2.5 Flash Lite (mặc định Gemini Flash Lite)
+  - Temperature: 0.7, Max tokens: 50000
+  - Prompt được tối ưu: thân thiện, đúng trọng tâm, không icon/emoji, Markdown rõ ràng, hỗ trợ EN/VI, hiểu bối cảnh Adaptive RAG (có/không có context)
+  - Logging: mỗi lần generate ghi `logs/generation_<timestamp>.json` (system/user prompt, answer, provider/model, error nếu có)
 
 ## 4. Giao diện Frontend
 
@@ -912,11 +904,10 @@ Hệ thống sử dụng language-aware model selection để tự động chọ
 #### 7.2.1. LLMConfig
 
 - `query_rewrite_model`: "gpt-4o"
-- `answer_generation_model`: "gpt-4o"
-- `query_rewrite_temperature`: 0.3
-- `query_rewrite_max_tokens`: 200
-- `answer_generation_temperature`: 0.7
-- `answer_generation_max_tokens`: 1000
+- `answer_generation_model`: "gpt-4o" (OpenAI) hoặc "gemini-2.5-flash-lite" (Gemini)
+- `answer_generation_provider`: "gemini" (mặc định, có thể đổi "openai")
+- `query_rewrite_temperature`: 0.3, `query_rewrite_max_tokens`: 200
+- `answer_generation_temperature`: 0.7, `answer_generation_max_tokens`: 50000
 
 #### 7.2.2. RetrievalConfig
 
@@ -936,13 +927,13 @@ Hệ thống sử dụng language-aware model selection để tự động chọ
 #### 7.2.4. AdaptiveConfig
 
 - `k_min`: 0
-- `k_max`: 20
-- `default_n`: 3
-- `style_candidates`: 10 styles (Vietnamese)
+- `k_max`: 10
+- `default_n`: 5 (có thể chỉnh 1-10 từ sidebar)
+- `style_candidates`: 10 styles (EN/VI mapping)
 - `phase1_model`: "gpt-4o"
 - `phase1_temperature`: 0.01
 - `phase1_max_tokens`: 64
-- `entropy_max`: 10
+- `entropy_max`: 0.5 (normalize entropy trước khi map k)
 
 #### 7.2.5. RerankerConfig
 
@@ -996,6 +987,7 @@ k_min = config.adaptive.k_min
 ### 8.4. LLM Integration
 
 - `openai>=1.0.0`: OpenAI API client
+- `google-generativeai>=0.3.0`: Gemini API client
 
 ### 8.5. Frontend
 
@@ -1006,7 +998,21 @@ k_min = config.adaptive.k_min
 
 - `OPENAI_API_KEY`: Required cho LLM calls
 
-## 9. Kết luận
+## 9. Hyperparameter Tuning (Entropy) - Tóm tắt
+
+- **Mục tiêu**: Tìm phương pháp tính entropy ổn định, tương quan với độ khó câu hỏi, và tối ưu n (iterations) cho adaptive k mapping.
+- **Dataset**: 101 queries/ngôn ngữ (EN/VI), phân loại easy/medium/hard, bao phủ factual/analytical/reasoning.
+- **Phương pháp so sánh**:
+  - Full Token n=1: Baseline; EN ổn, VI nhiễu; stability thấp.
+  - First N Tokens n=1: Không cải thiện, loại bỏ.
+  - Full Token n=5: Stability cao, entropy std ~0, phân tách độ khó rõ cho EN/VI → **chọn cho production**.
+- **Kết luận chính**:
+  - Entropy tăng tuyến tính với độ khó (easy ~0.19-0.25, medium ~0.25-0.30, hard ~0.30-0.40).
+  - Tăng n (5) giảm noise/outliers, curve mượt, đáng tin cậy hơn.
+  - Trade-off chi phí API 5x nhưng stability và chất lượng adaptive k cải thiện rõ.
+- **Tài liệu chi tiết**: `hyperparam_tuning/` (README, notebooks, CSV kết quả cho EN/VI và các biến thể).
+
+## 10. Kết luận
 
 Adaptive RAG System là một hệ thống RAG hoàn chỉnh với các tính năng:
 

@@ -3,7 +3,7 @@ import requests
 import time
 from typing import List, Dict, Any, Optional
 
-BACKEND_URL = "http://localhost:8000"
+BACKEND_URL = "http://localhost:5555"
 
 
 def estimate_tokens(text: str) -> int:
@@ -77,6 +77,28 @@ def get_collection_chunks(name: str, skip: int = 0, limit: int = 100) -> Dict[st
     return {"total": 0, "chunks": []}
 
 
+def get_collection_documents(name: str) -> Dict[str, Any]:
+    """Get list of uploaded documents with their sizes."""
+    try:
+        resp = requests.get(f"{BACKEND_URL}/collections/{name}/documents")
+        if resp.status_code == 200:
+            return resp.json()
+    except Exception:
+        pass
+    return {"total_documents": 0, "documents": []}
+
+
+def format_file_size(size_bytes: int) -> str:
+    """Format file size in bytes to human readable format."""
+    if size_bytes == 0:
+        return "0 B"
+    for unit in ["B", "KB", "MB", "GB"]:
+        if size_bytes < 1024.0:
+            return f"{size_bytes:.1f} {unit}"
+        size_bytes /= 1024.0
+    return f"{size_bytes:.1f} TB"
+
+
 def query_collection(collection_name: str, query: str, n: Optional[int] = None) -> Dict[str, Any]:
     payload = {"query": query}
     if n is not None:
@@ -87,81 +109,19 @@ def query_collection(collection_name: str, query: str, n: Optional[int] = None) 
     return {}
 
 
-def render_iteration_details(iterations_detail: List[Dict[str, Any]]) -> None:
-    """Render adaptive iteration responses without nesting expanders."""
-    if not iterations_detail:
-        return
-    
-    st.write("**Iteration responses:**")
-    for idx, iter_detail in enumerate(iterations_detail):
-        run_num = iter_detail.get("run", 0)
-        style = iter_detail.get("style", "")
-        output = iter_detail.get("output", "")
-        entropy = iter_detail.get("entropy", 0.0)
-        
-        st.markdown(f"**Iteration {run_num} (entropy: {entropy:.3f})**")
-        st.caption(f"Style: {style}")
-        st.markdown("**Response:**")
-        st.markdown(output)
-        st.caption(f"Entropy: {entropy:.3f}")
-        
-        if idx < len(iterations_detail) - 1:
-            st.divider()
+PAGE_ICON_PATH = "./frontend/assets/page_icon.jpg"
+ROLE_AVATARS = {
+    "user": "./frontend/assets/user_icon.jpg",
+    "assistant": "./frontend/assets/bot_icon.jpg",
+}
 
-
-def render_preview_documents(preview_docs: List[Dict[str, Any]]) -> None:
-    """Render document preview cards without nested expanders."""
-    if not preview_docs:
-        return
-    
-    st.write("**Preview documents:**")
-    for idx, doc in enumerate(preview_docs):
-        st.markdown(f"**Document {doc.get('index', 0)}** (score: {doc.get('score', 0):.4f})")
-        st.caption(f"Source: {doc.get('metadata', {}).get('source', 'Unknown')}")
-        st.text(doc.get("text", ""))
-        
-        if idx < len(preview_docs) - 1:
-            st.divider()
-
-
-def render_pipeline_steps(pipeline_steps: Dict[str, Any]) -> None:
-    """Common renderer for pipeline debug info (avoids nested expanders)."""
-    if not pipeline_steps:
-        return
-    
-    with st.expander("Pipeline Steps", expanded=False):
-        if "query_rewriting" in pipeline_steps:
-            step_time = pipeline_steps["query_rewriting"].get("time", 0)
-            with st.status(f"Step 1: Query Rewriting ({step_time}s)", expanded=False):
-                st.write(f"**Original:** {pipeline_steps['query_rewriting'].get('original_query', '')}")
-                st.write(f"**Rewritten:** {pipeline_steps['query_rewriting'].get('rewritten_query', '')}")
-        
-        if "adaptive_k_selection" in pipeline_steps:
-            step_time = pipeline_steps["adaptive_k_selection"].get("time", 0)
-            with st.status(f"Step 2: Adaptive K Selection ({step_time}s)", expanded=False):
-                st.metric("K selected", pipeline_steps["adaptive_k_selection"].get("k_determined", pipeline_steps["adaptive_k_selection"].get("k", 0)))
-                avg_entropy = pipeline_steps["adaptive_k_selection"].get("average_entropy")
-                if avg_entropy is not None:
-                    st.metric("Average Entropy", f"{avg_entropy:.3f}")
-                n_iterations = pipeline_steps["adaptive_k_selection"].get("n", 0)
-                if n_iterations is not None and n_iterations > 0:
-                    st.write(f"**Iterations:** {n_iterations}")
-                    render_iteration_details(pipeline_steps["adaptive_k_selection"].get("iterations_detail", []))
-        
-        if "retrieval" in pipeline_steps:
-            step_time = pipeline_steps["retrieval"].get("time", 0)
-            with st.status(f"Step 3: Retrieval ({step_time}s)", expanded=False):
-                st.write(f"Found {pipeline_steps['retrieval'].get('num_results', 0)} documents")
-                render_preview_documents(pipeline_steps["retrieval"].get("preview_documents", []))
-        
-        if "answer_generation" in pipeline_steps:
-            step_time = pipeline_steps["answer_generation"].get("time", 0)
-            with st.status(f"Step 4: Answer Generation ({step_time}s)", expanded=False):
-                st.write(f"Model: {pipeline_steps['answer_generation'].get('model', 'N/A')}")
-                st.write(f"Chunks used: {pipeline_steps['answer_generation'].get('num_chunks_used', 0)}")
-
-
-st.set_page_config(page_title="RAG System", layout="wide", initial_sidebar_state="expanded")
+# Page meta (must be before other Streamlit calls)
+st.set_page_config(
+    page_title="Adaptive RAG System",
+    page_icon=PAGE_ICON_PATH,
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -275,6 +235,31 @@ with st.sidebar:
                     status_text.empty()
                     st.error(upload_result.get("message", "Upload failed"))
             
+            # Collection Info Section
+            if coll_info.get("num_chunks", 0) > 0:
+                st.divider()
+                st.markdown("**Collection Info**")
+                
+                # Get documents info
+                docs_info = get_collection_documents(selected)
+                total_chunks = coll_info.get("num_chunks", 0)
+                documents = docs_info.get("documents", [])
+                
+                # Display total chunks
+                st.caption(f"Total Chunks: {total_chunks}")
+                
+                # Display documents list
+                if documents:
+                    st.caption(f"Uploaded Documents ({len(documents)}):")
+                    for doc in documents:
+                        filename = doc.get("filename", "Unknown")
+                        file_size = doc.get("file_size", 0)
+                        num_chunks = doc.get("num_chunks", 0)
+                        formatted_size = format_file_size(file_size)
+                        st.text(f"• {filename} ({formatted_size}) - {num_chunks} chunks")
+                else:
+                    st.caption("No documents uploaded yet")
+            
             if coll_info.get("num_chunks", 0) > 0:
                 st.divider()
                 
@@ -331,19 +316,73 @@ if st.session_state.selected_collection:
     st.title("Chat")
     
     for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+        with st.chat_message(message["role"], avatar=ROLE_AVATARS.get(message["role"])):
+            # Use container to ensure full markdown rendering without truncation
+            msg_container = st.container()
+            with msg_container:
+                st.markdown(message["content"])
             
             if message["role"] == "assistant" and "pipeline_steps" in message:
-                render_pipeline_steps(message["pipeline_steps"])
+                with st.expander("Pipeline Steps", expanded=False):
+                    steps = message["pipeline_steps"]
+                    
+                    if "query_rewriting" in steps:
+                        step_time = steps['query_rewriting'].get('time', 0)
+                        with st.status(f"Step 1: Query Rewriting ({step_time}s)", expanded=True):
+                            st.write(f"**Original:** {steps['query_rewriting'].get('original_query', '')}")
+                            st.write(f"**Rewritten:** {steps['query_rewriting'].get('rewritten_query', '')}")
+                    
+                    if "adaptive_k_selection" in steps:
+                        step_time = steps['adaptive_k_selection'].get('time', 0)
+                        with st.status(f"Step 2: Adaptive K Selection ({step_time}s)", expanded=False):
+                            st.metric("K selected", steps['adaptive_k_selection'].get('k_determined', steps['adaptive_k_selection'].get('k', 0)))
+                            avg_entropy = steps['adaptive_k_selection'].get('average_entropy')
+                            if avg_entropy is not None:
+                                st.metric("Average Entropy", f"{avg_entropy:.3f}")
+                            n_iterations = steps['adaptive_k_selection'].get('n', 0)
+                            if n_iterations is not None and n_iterations > 0:
+                                st.write(f"**Iterations:** {n_iterations}")
+                                iterations_detail = steps['adaptive_k_selection'].get('iterations_detail', [])
+                                if iterations_detail:
+                                    st.write("**Iteration responses:**")
+                                    for iter_detail in iterations_detail:
+                                        run_num = iter_detail.get('run', 0)
+                                        style = iter_detail.get('style', '')
+                                        output = iter_detail.get('output', '')
+                                        entropy = iter_detail.get('entropy', 0.0)
+                                        with st.expander(f"Iteration {run_num} (entropy: {entropy:.3f})", expanded=False):
+                                            st.caption(f"Style: {style}")
+                                            st.markdown("**Response:**")
+                                            # Render markdown directly - Streamlit should handle full content
+                                            # If truncation occurs, it's likely due to content length limits
+                                            st.markdown(output)
+                                            st.caption(f"Entropy: {entropy:.3f}")
+                    
+                    if "retrieval" in steps:
+                        step_time = steps['retrieval'].get('time', 0)
+                        with st.status(f"Step 3: Retrieval ({step_time}s)", expanded=False):
+                            st.write(f"Found {steps['retrieval'].get('num_results', 0)} documents")
+                            preview_docs = steps['retrieval'].get('preview_documents', [])
+                            if preview_docs:
+                                st.write("**Preview documents:**")
+                                for doc in preview_docs:
+                                    with st.expander(f"Document {doc.get('index', 0)} (score: {doc.get('score', 0):.4f})", expanded=False):
+                                        st.caption(f"Source: {doc.get('metadata', {}).get('source', 'Unknown')}")
+                                        st.text(doc.get('text', ''))
+                    
+                    if "answer_generation" in steps:
+                        step_time = steps['answer_generation'].get('time', 0)
+                        with st.status(f"Step 4: Answer Generation ({step_time}s)", expanded=False):
+                            st.write(f"Model: {steps['answer_generation'].get('model', 'N/A')}")
+                            st.write(f"Chunks used: {steps['answer_generation'].get('num_chunks_used', 0)}")
     
     if prompt := st.chat_input("Ask a question..."):
         st.session_state.messages.append({"role": "user", "content": prompt})
         
-        with st.chat_message("user"):
+        with st.chat_message("user", avatar=ROLE_AVATARS["user"]):
             st.markdown(prompt)
         
-        with st.chat_message("assistant"):
+        with st.chat_message("assistant", avatar=ROLE_AVATARS["assistant"]):
             with st.spinner("Processing..."):
                 n = st.session_state.get("adaptive_n", 5)
                 response = query_collection(st.session_state.selected_collection, prompt, n=n)
@@ -352,30 +391,90 @@ if st.session_state.selected_collection:
                 answer = response.get("answer", "")
                 
                 if answer:
-                    words = answer.split()
+                    # Stream by sentences to preserve markdown syntax and avoid text selection issues
                     answer_placeholder = st.empty()
+                    
+                    # Split by sentences (keep the separators)
+                    import re
+                    sentence_parts = re.split(r'([.!?]\s+)', answer)
+                    
+                    # Stream sentence by sentence
                     streamed_text = ""
+                    for i in range(len(sentence_parts)):
+                        streamed_text += sentence_parts[i]
+                        # Update after each complete sentence
+                        if i > 0 and (i % 2 == 0 or i == len(sentence_parts) - 1):
+                            answer_placeholder.markdown(streamed_text)
+                            time.sleep(0.03)
                     
-                    for word in words:
-                        streamed_text += word + " "
-                        answer_placeholder.markdown(streamed_text + "▌")
-                        time.sleep(0.02)
-                    
-                    answer_placeholder.markdown(streamed_text)
+                    # Final render to ensure complete markdown is displayed without truncation
+                    # Clear placeholder and render final answer
+                    answer_placeholder.empty()
+                    st.markdown(answer)
                     
                     pipeline_steps = response.get("pipeline_steps", {})
                     total_time = pipeline_steps.get("total_time", 0)
                     
                     st.markdown(f"<p style='color: #808080; margin-top: 10px; margin-bottom: 0;'>{total_time}s</p>", unsafe_allow_html=True)
                     
-                    render_pipeline_steps(pipeline_steps)
+                    with st.expander("Pipeline Steps", expanded=False):
+                        if "query_rewriting" in pipeline_steps:
+                            step_time = pipeline_steps['query_rewriting'].get('time', 0)
+                            with st.status(f"Step 1: Query Rewriting ({step_time}s)", expanded=False):
+                                st.write(f"**Original:** {pipeline_steps['query_rewriting'].get('original_query', '')}")
+                                st.write(f"**Rewritten:** {pipeline_steps['query_rewriting'].get('rewritten_query', '')}")
+                        
+                        if "adaptive_k_selection" in pipeline_steps:
+                            step_time = pipeline_steps['adaptive_k_selection'].get('time', 0)
+                            with st.status(f"Step 2: Adaptive K Selection ({step_time}s)", expanded=False):
+                                st.metric("K selected", pipeline_steps['adaptive_k_selection'].get('k_determined', pipeline_steps['adaptive_k_selection'].get('k', 0)))
+                                avg_entropy = pipeline_steps['adaptive_k_selection'].get('average_entropy')
+                                if avg_entropy is not None:
+                                    st.metric("Average Entropy", f"{avg_entropy:.3f}")
+                                n_iterations = pipeline_steps['adaptive_k_selection'].get('n', 0)
+                                if n_iterations is not None and n_iterations > 0:
+                                    st.write(f"**Iterations:** {n_iterations}")
+                                    iterations_detail = pipeline_steps['adaptive_k_selection'].get('iterations_detail', [])
+                                    if iterations_detail:
+                                        st.write("**Iteration responses:**")
+                                        for iter_detail in iterations_detail:
+                                            run_num = iter_detail.get('run', 0)
+                                            style = iter_detail.get('style', '')
+                                            output = iter_detail.get('output', '')
+                                            entropy = iter_detail.get('entropy', 0.0)
+                                            with st.expander(f"Iteration {run_num} (entropy: {entropy:.3f})", expanded=False):
+                                                st.caption(f"Style: {style}")
+                                                st.markdown("**Response:**")
+                                                # Render markdown directly - Streamlit should handle full content
+                                                # If truncation occurs, it's likely due to content length limits
+                                                st.markdown(output)
+                                                st.caption(f"Entropy: {entropy:.3f}")
+                        
+                        if "retrieval" in pipeline_steps:
+                            step_time = pipeline_steps['retrieval'].get('time', 0)
+                            with st.status(f"Step 3: Retrieval ({step_time}s)", expanded=False):
+                                st.write(f"Found {pipeline_steps['retrieval'].get('num_results', 0)} documents")
+                                preview_docs = pipeline_steps['retrieval'].get('preview_documents', [])
+                                if preview_docs:
+                                    st.write("**Preview documents:**")
+                                    for doc in preview_docs:
+                                        with st.expander(f"Document {doc.get('index', 0)} (score: {doc.get('score', 0):.4f})", expanded=False):
+                                            st.caption(f"Source: {doc.get('metadata', {}).get('source', 'Unknown')}")
+                                            st.text(doc.get('text', ''))
+                        
+                        if "answer_generation" in pipeline_steps:
+                            step_time = pipeline_steps['answer_generation'].get('time', 0)
+                            with st.status(f"Step 4: Answer Generation ({step_time}s)", expanded=False):
+                                st.write(f"Model: {pipeline_steps['answer_generation'].get('model', 'N/A')}")
+                                st.write(f"Chunks used: {pipeline_steps['answer_generation'].get('num_chunks_used', 0)}")
                     
                     st.session_state.messages.append({
                         "role": "assistant",
-                        "content": streamed_text,
+                        "content": answer,  # Use full answer, not streamed_text
                         "pipeline_steps": pipeline_steps
                     })
                 else:
                     st.write("No answer generated.")
 else:
     st.info("Please select or create a collection from the sidebar to start chatting.")
+

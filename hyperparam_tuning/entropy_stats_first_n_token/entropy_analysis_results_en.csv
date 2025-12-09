@@ -1,0 +1,102 @@
+sample_id,query,difficulty,entropy,entropy_std,n_iterations,num_tokens
+1,what is python?,easy,0.00017558026360470157,0.0,1,5
+2,what is git?,easy,0.0007527490701669402,0.0,1,5
+3,what is ai?,easy,0.1687024409494196,0.0,1,5
+4,what is machine learning?,easy,0.18576425131790014,0.0,1,5
+5,what is deep learning?,easy,0.002023018492707955,0.0,1,5
+6,what is neural network?,easy,2.5064480543880113e-06,0.0,1,5
+7,what is a database?,easy,0.01583590666725426,0.0,1,5
+8,what is an algorithm?,easy,0.01860933544138122,0.0,1,5
+9,what is programming?,easy,1.041727666213952e-05,0.0,1,5
+10,what is software?,easy,0.07403037136540107,0.0,1,5
+11,what is java?,easy,0.004194112754456859,0.0,1,5
+12,what is javascript?,easy,0.06649448609878626,0.0,1,5
+13,what is html?,easy,0.2550151560598637,0.0,1,5
+14,what is css?,easy,0.05424569747726132,0.0,1,5
+15,what is sql?,easy,0.07442604492934733,0.0,1,5
+16,what is api?,easy,0.20118492137564262,0.0,1,5
+17,what is json?,easy,0.04627049178135789,0.0,1,5
+18,what is xml?,easy,0.22553464731733652,0.0,1,5
+19,what is http?,easy,0.1293286046497915,0.0,1,5
+20,what is https?,easy,0.12686385126303784,0.0,1,5
+21,what is tcp?,easy,0.03877469825831435,0.0,1,5
+22,what is ip?,easy,0.10740940628426718,0.0,1,5
+23,what is dns?,easy,0.030491233489877635,0.0,1,5
+24,what is cloud?,easy,0.5333039628067615,0.0,1,5
+25,what is docker?,easy,0.1171004619052356,0.0,1,5
+26,what is kubernetes?,easy,0.00038968651701124066,0.0,1,5
+27,what is linux?,easy,0.0011769025070029577,0.0,1,5
+28,what is windows?,easy,0.04117048801096464,0.0,1,5
+29,what is macos?,easy,0.1762232678331609,0.0,1,5
+30,what is ios?,easy,0.12365953738871834,0.0,1,5
+31,what is android?,easy,0.05147303125739523,0.0,1,5
+32,what is html5?,easy,0.1825610069083165,0.0,1,5
+33,what is css3?,easy,0.1812860723321086,0.0,1,5
+34,what is react?,easy,0.02450508126031487,0.0,1,5
+35,compare machine learning and deep learning,medium,0.08208944775206276,0.0,1,5
+36,difference between cnn and rnn,medium,0.08841802290140424,0.0,1,5
+37,when to use reinforcement learning,medium,0.23467175748092842,0.0,1,5
+38,advantages of transformer architecture,medium,0.08831037013004811,0.0,1,5
+39,how does attention mechanism work,medium,0.5257626370100333,0.0,1,5
+40,explain gradient descent,medium,0.00532984340352379,0.0,1,5
+41,what is overfitting and how to fix it,medium,0.01826146237870842,0.0,1,5
+42,difference between supervised and unsupervised learning,medium,0.044884021961665285,0.0,1,5
+43,how does backpropagation work,medium,0.12746558013651135,0.0,1,5
+44,what are activation functions in neural networks,medium,0.008772354824775449,0.0,1,5
+45,difference between classification and regression,medium,0.34544267676708307,0.0,1,5
+46,explain cross-validation,medium,0.10136841457054498,0.0,1,5
+47,what is regularization in machine learning,medium,0.01795602150253662,0.0,1,5
+48,difference between batch and stochastic gradient descent,medium,0.19633886237942133,0.0,1,5
+49,how does dropout work,medium,0.02290542584410788,0.0,1,5
+50,explain batch normalization,medium,0.00032321127154640906,0.0,1,5
+51,what is transfer learning,medium,0.0009128432222894218,0.0,1,5
+52,difference between rnn and lstm,medium,0.2248289727503323,0.0,1,5
+53,how does convolutional layer work,medium,0.1474560909530857,0.0,1,5
+54,explain pooling in cnn,medium,0.23349192334206034,0.0,1,5
+55,what is data augmentation,medium,0.008683755229292656,0.0,1,5
+56,difference between precision and recall,medium,0.16152635440598279,0.0,1,5
+57,explain f1 score,medium,0.003193577242232281,0.0,1,5
+58,what is confusion matrix,medium,1.0833319170911394e-06,0.0,1,5
+59,how does k-means clustering work,medium,0.23154582657668313,0.0,1,5
+60,difference between random forest and gradient boosting,medium,0.26942790287635715,0.0,1,5
+61,explain feature selection,medium,0.030276341931018004,0.0,1,5
+62,what is dimensionality reduction,medium,0.0006166700726150586,0.0,1,5
+63,difference between svm and logistic regression,medium,0.0740975088532527,0.0,1,5
+64,how does ensemble learning work,medium,0.11793518083112517,0.0,1,5
+65,explain bias-variance tradeoff,medium,9.075875192858644e-06,0.0,1,5
+66,what is early stopping,medium,0.10878241033583598,0.0,1,5
+67,difference between validation and test set,medium,0.052134667383243606,0.0,1,5
+68,how does hyperparameter tuning work,medium,0.11939862745559018,0.0,1,5
+69,design a deep learning model to process multilingual text with diacritics,hard,0.06645152894532061,0.0,1,5
+70,analyze the trade-off between model complexity and generalization in transformers,hard,0.3067714060721378,0.0,1,5
+71,explain in detail how backpropagation works in multi-layer neural networks with skip connections,hard,0.031003432455809783,0.0,1,5
+72,"compare modern GAN architectures: StyleGAN, BigGAN, and Progressive GAN with their trade-offs",hard,0.22282413915395946,0.0,1,5
+73,how to optimize training of large language models with limited computational resources,hard,0.3683416639489352,0.0,1,5
+74,analyze different regularization techniques in deep learning and when to use each,hard,0.24181043085325782,0.0,1,5
+75,design a transformer architecture optimized for low-resource languages,hard,0.07896669681132254,0.0,1,5
+76,explain the mathematical foundations of self-attention mechanism in transformers,hard,0.01887029546645104,0.0,1,5
+77,"compare different optimization algorithms: Adam, SGD, and RMSprop with their trade-offs and use cases",hard,0.32002629011094613,0.0,1,5
+78,"analyze the relationship between batch size, learning rate, and training stability in deep learning",hard,0.12733316435410383,0.0,1,5
+79,design an end-to-end system for real-time object detection using deep learning,hard,0.0535167591072707,0.0,1,5
+80,explain how to handle class imbalance in multi-class classification problems,hard,0.028257999856975347,0.0,1,5
+81,analyze the impact of different loss functions on training convergence and model performance,hard,0.116669117068215,0.0,1,5
+82,design a neural architecture search strategy for automated model design,hard,0.2534260562930781,0.0,1,5
+83,explain the mathematical principles behind variational autoencoders,hard,0.07350774762318453,0.0,1,5
+84,"compare different approaches to sequence-to-sequence learning: attention, transformers, and CNNs",hard,0.19258133690271267,0.0,1,5
+85,analyze the challenges and solutions for training deep neural networks on small datasets,hard,0.166424559132434,0.0,1,5
+86,explain how to implement gradient clipping to prevent exploding gradients in RNNs,hard,0.1395633519529033,0.0,1,5
+87,design a multi-task learning framework that shares knowledge across related tasks,hard,0.11731687534601506,0.0,1,5
+88,analyze the theoretical guarantees and limitations of different deep learning architectures,hard,0.293119318661483,0.0,1,5
+89,explain how to use knowledge distillation to compress large models into smaller ones,hard,0.2098143590197538,0.0,1,5
+90,compare different approaches to handling missing data in deep learning pipelines,hard,0.3512600719211775,0.0,1,5
+91,analyze the role of different activation functions in addressing vanishing gradient problem,hard,0.2045094478813346,0.0,1,5
+92,design a federated learning system for training models across distributed data sources,hard,0.5795782185764311,0.0,1,5
+93,explain how to implement curriculum learning for improving model training,hard,0.16200939239084064,0.0,1,5
+94,compare different strategies for handling imbalanced datasets in deep learning,hard,0.05753102759087368,0.0,1,5
+95,analyze the impact of different normalization techniques on model performance,hard,0.355164844717201,0.0,1,5
+96,design a system for online learning that adapts to changing data distributions,hard,0.34074866929346986,0.0,1,5
+97,explain the mathematical foundations of generative adversarial networks,hard,0.0110109231202877,0.0,1,5
+98,analyze the trade-offs between model interpretability and performance in deep learning,hard,0.18485583790630708,0.0,1,5
+99,design a neural architecture that can handle both image and text inputs simultaneously,hard,0.39690704558696255,0.0,1,5
+100,explain how to implement continual learning to prevent catastrophic forgetting,hard,0.057805444396948034,0.0,1,5
+101,"compare different approaches to model compression: pruning, quantization, and distillation",hard,0.44112152260550125,0.0,1,5

@@ -83,6 +83,44 @@ async def get_collection_info(name: str) -> Dict[str, Any]:
     }
 
 
+@app.get("/collections/{name}/documents", response_model=Dict[str, Any])
+async def get_collection_documents(name: str) -> Dict[str, Any]:
+    """
+    Get list of uploaded documents with their sizes.
+    Returns unique documents with total chunks per document.
+    """
+    if name not in collections:
+        raise HTTPException(status_code=404, detail="Collection not found")
+    
+    coll = collections[name]
+    
+    # Aggregate documents by source (filename)
+    doc_info: Dict[str, Dict[str, Any]] = {}
+    
+    # First pass: collect document info and count chunks
+    for meta in coll.metadata:
+        source = meta.get("source", "unknown")
+        file_size = meta.get("file_size", 0)
+        
+        if source not in doc_info:
+            doc_info[source] = {
+                "filename": source,
+                "file_size": file_size,
+                "file_type": meta.get("file_type", "unknown"),
+                "num_chunks": 0
+            }
+        
+        # Count chunks per document
+        doc_info[source]["num_chunks"] += 1
+    
+    documents_list = list(doc_info.values())
+    
+    return {
+        "total_documents": len(documents_list),
+        "documents": documents_list
+    }
+
+
 @app.get("/collections/{name}/chunks", response_model=Dict[str, Any])
 async def get_collection_chunks(name: str, skip: int = 0, limit: int = 100) -> Dict[str, Any]:
     if name not in collections:
@@ -129,11 +167,17 @@ async def upload_documents(
     
     for f in files:
         try:
+            # Read file content to get size
+            file_data = f.file.read()
+            file_size = len(file_data)
+            # Reset file pointer for reading text
+            f.file.seek(0)
             text = read_file_to_text(f)
             all_texts.append(text)
             all_meta.append({
                 "source": f.filename or "unknown",
-                "file_type": f.content_type or "unknown"
+                "file_type": f.content_type or "unknown",
+                "file_size": file_size  # Size in bytes
             })
         except Exception as e:
             raise HTTPException(
