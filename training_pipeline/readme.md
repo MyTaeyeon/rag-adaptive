@@ -46,7 +46,7 @@ Output: Thống kê mô tả và các biểu đồ so sánh
 ## Mục Đích
 
 So sánh 3 phương pháp RAG:
-1. Baseline RAG (k=5 cố định)
+1. Baseline RAG (k=3 cố định)
 2. Adaptive RAG Mini (n=1, k thích ứng)
 3. Adaptive RAG Full (n=5, k thích ứng)
 
@@ -165,3 +165,75 @@ pip install openai numpy python-dotenv
 ### Lỗi Import
 
 Đảm bảo chạy script từ đúng thư mục hoặc sử dụng đường dẫn đầy đủ.
+
+## Tổng Hợp Kết Quả Thực Nghiệm
+
+Kết quả được thu thập từ 100 samples trên dataset European Union Law.
+
+### Tổng Quan
+
+- **Số lượng samples**: 100
+- **Dataset**: European Union Law
+- **3 phương pháp so sánh**:
+  - **M1 (Baseline RAG)**: k=3 cố định
+  - **M2 (Adaptive RAG Mini)**: n=1, k thích ứng
+  - **M3 (Adaptive RAG Full)**: n=5, k thích ứng
+
+### Kết Quả Chi Tiết
+
+#### 1. Latency (Thời gian xử lý)
+
+| Method | Mean Latency (ms) |
+|--------|-------------------|
+| M1 (Baseline) | 1,727.7 |
+| M2 (Adaptive Mini) | 2,774.1 |
+| M3 (Adaptive Full) | 5,027.7 |
+
+**Nhận xét**: Baseline có latency thấp nhất do không có bước phân tích entropy. Adaptive Full có latency cao nhất do phải thực hiện 5 lần phân tích entropy.
+
+#### 2. Token Usage (Sử dụng token)
+
+**Input Tokens:**
+| Method | Mean | Total |
+|--------|------|-------|
+| M1 (Baseline) | 248 | 24,826 |
+| M2 (Adaptive Mini) | 567 | 56,730 |
+| M3 (Adaptive Full) | 738 | 73,810 |
+
+**Output Tokens:**
+| Method | Mean | Total |
+|--------|------|-------|
+| M1 (Baseline) | 38 | 3,782 |
+| M2 (Adaptive Mini) | 56 | 5,554 |
+| M3 (Adaptive Full) | 97 | 9,690 |
+
+**Nhận xét**: Adaptive methods sử dụng nhiều token hơn do cần thêm context cho việc phân tích entropy và retrieve nhiều documents hơn khi cần thiết.
+
+#### 3. Judge Score (Điểm đánh giá chất lượng)
+
+| Method | Average Score | Accuracy (score >= 0.5) |
+|--------|---------------|-------------------------|
+| M1 (Baseline) | 0.828 | 82.0% |
+| M2 (Adaptive Mini) | 0.888 | 89.0% |
+| M3 (Adaptive Full) | 0.908 | 91.0% |
+
+**Nhận xét**: 
+- Adaptive methods cho kết quả tốt hơn về chất lượng, với M3 (Adaptive Full) đạt điểm cao nhất (0.908)
+- Accuracy của M3 cao hơn M1 khoảng 9%, cho thấy adaptive retrieval giúp cải thiện đáng kể chất lượng câu trả lời
+
+### Kết Luận
+
+1. **Về chất lượng**: Adaptive RAG (đặc biệt là Adaptive Full) cho kết quả tốt hơn Baseline, với điểm judge score cao hơn và accuracy tốt hơn.
+
+2. **Về hiệu suất**: Baseline có latency và token usage thấp nhất, phù hợp cho các ứng dụng cần tốc độ và chi phí thấp.
+
+3. **Trade-off**: Adaptive methods đánh đổi latency và token usage để đạt được chất lượng tốt hơn. Adaptive Mini (M2) là sự cân bằng tốt giữa chất lượng và hiệu suất.
+
+### Files Kết Quả
+
+- **`result/results.csv`**: File CSV chứa tất cả metrics chi tiết cho 100 samples
+- **`result/training_log.jsonl`**: Log chi tiết từ Phase 1
+- **`result/score.jsonl`**: Scores từ Phase 2
+- **`phase3/plots/`**: Các biểu đồ visualization so sánh metrics
+
+Xem chi tiết thống kê và visualization trong file `test.ipynb`.
