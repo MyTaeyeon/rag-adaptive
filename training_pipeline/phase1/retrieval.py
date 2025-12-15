@@ -13,13 +13,14 @@ from openai import OpenAI
 
 sys.path.append(str(Path(__file__).parent.parent))
 import config
-from chunking import chunk_text
+from chunking import chunk_text, chunk_text_by_sentences
 
 
 class InMemoryRetrieval:
     """
     Retrieval system đơn giản, in-memory.
     Lưu embeddings trong RAM, tự động xóa sau khi sử dụng.
+    Hỗ trợ cả character-based và sentence-based chunking.
     """
     
     def __init__(self):
@@ -27,15 +28,24 @@ class InMemoryRetrieval:
         self.embedding_model = config.EMBEDDING_MODEL
         self.chunks = []
         self.embeddings = None
+        # Lấy chunking method từ config
+        self.chunking_method = getattr(config, 'CHUNKING_METHOD', 'character')
     
     def index_context(self, context: str) -> None:
         """
         Chunk context và tạo embeddings, lưu trong RAM.
+        Sử dụng chunking method từ config.
         
         Args:
             context: Context text cần index
         """
-        self.chunks = chunk_text(context)
+        # Chọn phương thức chunking
+        if self.chunking_method == "sentence":
+            self.chunks = chunk_text_by_sentences(context)
+        else:
+            self.chunks = chunk_text(context)
+        
+        print(f"  [Retrieval] Chunking method: {self.chunking_method}, Chunks created: {len(self.chunks)}")
         
         if not self.chunks:
             self.embeddings = np.array([])

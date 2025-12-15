@@ -90,7 +90,7 @@ def _build_style_prompt(query: str, style: str) -> str:
     """
     return (
         f"Trả lời câu hỏi sau với phong cách {style}. "
-        f"Giữ nội dung chính xác ngắn gọn.\n\n"
+        f"GIỚI HẠN: tối đa 1-3 câu, không giải thích thêm, không đưa ví dụ\n\n"
         f"Câu hỏi: {query}"
     )
 
@@ -193,33 +193,66 @@ def _generate_answer(
     return text, entropy
 
 
-def entropy_to_k(entropy: float, k_min: int = 0, k_max: int = 10) -> int:
-    """Chuyển entropy (bits/token) → k với log-scale để phân biệt tốt hơn.
-
-    Yêu cầu thực tế:
-    - Câu rất chắc chắn (entropy ~ 0.01–0.05) → k nên ~ 0.
-    - Câu khó hơn (entropy ~ 0.2–0.5) → k nên tăng rõ ràng (2–4).
-    - Câu rất mơ hồ / khó (entropy > 1–2) → k gần k_max.
-
-    Ta dùng log-scale: e' = log(1 + entropy), rồi chuẩn hoá e' vào [0, 1].
-    Điều này làm khác biệt nhỏ ở vùng entropy thấp vẫn nhìn thấy rõ hơn.
+def entropy_to_k(entropy, k_min=None, k_max=None, entropy_min=None, entropy_max=None, alpha=None):
+    """
+    Map entropy to k using exponential saturation curve.
     
-    Args:
-        entropy: Entropy (bits/token)
-        k_min: Giá trị k tối thiểu
-        k_max: Giá trị k tối đa
+    Logic:
+    - entropy < entropy_min  → k = k_min
+    - entropy = entropy_min  → k = k_min + 1
+    - entropy tăng dần      → k tăng từ (k_min+1) đến k_max
+    - entropy >= entropy_max → k = k_max
+    
+    Parameters:
+    - entropy: float, giá trị entropy
+    - k_min: minimum documents khi entropy rất thấp (default from config)
+    - k_max: maximum documents (default from config)
+    - entropy_min: ngưỡng bắt đầu retrieve (default from config)
+    - entropy_max: ngưỡng retrieve tối đa (default from config)
+    - alpha: độ dốc, càng cao càng dốc ban đầu (default from config)
     
     Returns:
-        Giá trị k (số lượng chunk/document cần retrieve)
+    - k: int, số document để retrieve
     """
-    if entropy <= 0:
+    # Import config for default values
+    import sys
+    from pathlib import Path
+    sys.path.append(str(Path(__file__).parent.parent))
+    import config
+    
+    # Use config values as defaults
+    if k_min is None:
+        k_min = config.K_MIN
+    if k_max is None:
+        k_max = config.K_MAX
+    if entropy_min is None:
+        entropy_min = config.ENTROPY_MIN
+    if entropy_max is None:
+        entropy_max = config.ENTROPY_MAX
+    if alpha is None:
+        alpha = config.ENTROPY_ALPHA
+    # Dưới ngưỡng min → không retrieve
+    if entropy < entropy_min:
         return k_min
-
-    max_entropy_base = 0.3
-    e_norm = min(entropy / max_entropy_base, 1.0)
-
-    k_float = k_min + e_norm * (k_max - k_min)
-    return int(round(k_float))
+    
+    # Trên ngưỡng max → retrieve tối đa
+    if entropy >= entropy_max:
+        return k_max
+    
+    # Normalize entropy to [0, 1]
+    t = (entropy - entropy_min) / (entropy_max - entropy_min)
+    
+    # Exponential saturation, normalized để f(0)=0, f(1)=1
+    # f(t) = (1 - exp(-α*t)) / (1 - exp(-α))
+    f_t = (1 - math.exp(-alpha * t)) / (1 - math.exp(-alpha))
+    
+    # Map từ (k_min + 1) đến k_max
+    # Tại t=0 (entropy=entropy_min): k = k_min + 1
+    # Tại t=1 (entropy=entropy_max): k = k_max
+    k_range = k_max - k_min - 1  # range từ (k_min+1) đến k_max
+    k_continuous = (k_min + 1) + k_range * f_t
+    
+    return int(round(k_continuous))
 
 
 def adaptive_k(

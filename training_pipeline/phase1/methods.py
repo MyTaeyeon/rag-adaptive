@@ -20,7 +20,7 @@ from training import sequence_entropy_from_token_logprobs, entropy_to_k, _build_
 
 class BaselineRAG:
     """
-    Method 1: Baseline RAG with fixed k=5
+    Method 1: Baseline RAG with fixed k (from config)
     """
     
     def __init__(self, retrieval: InMemoryRetrieval, generator: LLMGenerator):
@@ -54,7 +54,8 @@ class BaselineRAG:
         total_latency_ms = (time.time() - start_time) * 1000
         
         return {
-            "description": "Fixed k=5",
+            "description": f"Fixed k={self.k}",
+            "prompt": gen_result["prompt"],
             "config": {
                 "k_fixed": self.k
             },
@@ -114,12 +115,25 @@ class AdaptiveMiniRAG:
         else:
             entropy = 0.0
         
-        k_determined = entropy_to_k(entropy, k_min=self.k_min, k_max=self.k_max)
+        # Use config k_min/k_max directly (allow k=0 for confident answers)
+        num_chunks = len(self.retrieval.chunks)
+        effective_k_max = min(self.k_max, num_chunks)
+        
+        k_determined = entropy_to_k(
+            entropy, 
+            k_min=self.k_min,      # Use config K_MIN (can be 0)
+            k_max=effective_k_max
+        )
         
         phase2_start = time.time()
         
-        chunks = self.retrieval.retrieve(query, k=k_determined)
-        retrieved_context = "\n\n".join([chunk["text"] for chunk in chunks])
+        # Handle k=0: no retrieval needed (model is confident)
+        if k_determined == 0:
+            retrieved_context = None
+            chunks = []
+        else:
+            chunks = self.retrieval.retrieve(query, k=k_determined)
+            retrieved_context = "\n\n".join([chunk["text"] for chunk in chunks])
         
         gen_result_phase2 = self.generator.generate(
             query=query,
@@ -137,6 +151,10 @@ class AdaptiveMiniRAG:
         
         return {
             "description": "Adaptive k based on single pass entropy",
+            "prompt": {
+                "phase1_prompt": gen_result_phase1["prompt"],
+                "phase2_prompt": gen_result_phase2["prompt"]
+            },
             "config": {
                 "k_min": self.k_min,
                 "k_max": self.k_max
@@ -216,19 +234,34 @@ class AdaptiveN5RAG:
             iterations_detail.append({
                 "run": i + 1,
                 "style": style,
+                "prompt": gen_result["prompt"],
                 "output": gen_result["output"],
                 "entropy": entropy
             })
         
         average_entropy = sum(entropies) / len(entropies)
-        k_determined = entropy_to_k(average_entropy, k_min=self.k_min, k_max=self.k_max)
+        
+        # Use config k_min/k_max directly (allow k=0 for confident answers)
+        num_chunks = len(self.retrieval.chunks)
+        effective_k_max = min(self.k_max, num_chunks)
+        
+        k_determined = entropy_to_k(
+            average_entropy, 
+            k_min=self.k_min,      # Use config K_MIN (can be 0)
+            k_max=effective_k_max
+        )
         
         phase1_latency_ms = (time.time() - phase1_start) * 1000
         
         phase2_start = time.time()
         
-        chunks = self.retrieval.retrieve(query, k=k_determined)
-        retrieved_context = "\n\n".join([chunk["text"] for chunk in chunks])
+        # Handle k=0: no retrieval needed (model is confident)
+        if k_determined == 0:
+            retrieved_context = None
+            chunks = []
+        else:
+            chunks = self.retrieval.retrieve(query, k=k_determined)
+            retrieved_context = "\n\n".join([chunk["text"] for chunk in chunks])
         
         gen_result_phase2 = self.generator.generate(
             query=query,
@@ -246,6 +279,10 @@ class AdaptiveN5RAG:
         
         return {
             "description": "Adaptive k based on average entropy of 5 passes",
+            "prompt": {
+                "phase1_prompts": [it["prompt"] for it in iterations_detail],
+                "phase2_prompt": gen_result_phase2["prompt"]
+            },
             "config": {
                 "n_iterations": self.n,
                 "k_min": self.k_min,

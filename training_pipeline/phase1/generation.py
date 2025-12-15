@@ -47,6 +47,7 @@ class LLMGenerator:
             Dict với keys:
             {
                 "output": "...",
+                "prompt": "...",  # Prompt đã gửi đến LLM
                 "total_input_tokens": 100,
                 "total_output_tokens": 50,
                 "latency_ms": 1200,
@@ -88,6 +89,7 @@ class LLMGenerator:
         
         result = {
             "output": output,
+            "prompt": prompt,  # Track the prompt sent to LLM
             "total_input_tokens": response.usage.prompt_tokens,
             "total_output_tokens": response.usage.completion_tokens,
             "latency_ms": latency_ms

@@ -75,9 +75,21 @@ def process_sample(
             "stage_1_results": {}
         }
         
-        result["stage_1_results"]["method_1_baseline"] = baseline.run(query)
-        result["stage_1_results"]["method_2_adaptive_mini"] = adaptive_mini.run(query)
-        result["stage_1_results"]["method_3_adaptive_n5"] = adaptive_n5.run(query)
+        m1_result = baseline.run(query)
+        m2_result = adaptive_mini.run(query)
+        m3_result = adaptive_n5.run(query)
+        
+        result["stage_1_results"]["method_1_baseline"] = m1_result
+        result["stage_1_results"]["method_2_adaptive_mini"] = m2_result
+        result["stage_1_results"]["method_3_adaptive_n5"] = m3_result
+        
+        # Log k values for verification
+        m1_k = config.BASELINE_K
+        m2_k = m2_result.get("phase_1_analysis", {}).get("k_determined", "?")
+        m3_k = m3_result.get("phase_1_analysis", {}).get("k_determined", "?")
+        m2_entropy = m2_result.get("phase_1_analysis", {}).get("calculated_entropy", 0)
+        m3_entropy = m3_result.get("phase_1_analysis", {}).get("average_entropy", 0)
+        print(f"    k: M1={m1_k}(fixed), M2={m2_k}(e={m2_entropy:.3f}), M3={m3_k}(e={m3_entropy:.3f})")
         
         result["metadata"] = {
             "timestamp": datetime.now().isoformat(),
@@ -110,9 +122,25 @@ def main():
     
     print(f"\nLoading dataset from: {dataset_path}")
     with open(dataset_path, 'r', encoding='utf-8') as f:
-        samples = json.load(f)
+        all_samples = json.load(f)
     
-    print(f"Total samples: {len(samples)}")
+    # ===============================
+    # SAMPLE SELECTION MODE
+    # Uncomment ONE of the following options:
+    # ===============================
+    
+    # Option 1: QUICK TEST - 5 samples để verify config
+    # samples = all_samples[:5]
+    
+    # Option 2: MEDIUM TEST - 10 samples cách nhau
+    # test_indices = list(range(0, min(100, len(all_samples)), 10))
+    # samples = [all_samples[i] for i in test_indices if i < len(all_samples)]
+    
+    # Option 3: FULL RUN - Tất cả samples
+    samples = all_samples
+    
+    # ===============================
+    print(f"Total samples to process: {len(samples)}")
     
     normalized_samples = normalize_sample_ids(samples)
     print("Sample IDs normalized: 0 to", len(normalized_samples) - 1)
@@ -130,6 +158,7 @@ def main():
     print("\nInitializing systems...")
     retrieval = InMemoryRetrieval()
     generator = LLMGenerator()
+    
     baseline = BaselineRAG(retrieval, generator)
     adaptive_mini = AdaptiveMiniRAG(retrieval, generator)
     adaptive_n5 = AdaptiveN5RAG(retrieval, generator)
