@@ -47,7 +47,7 @@ Adaptive RAG (Retrieval-Augmented Generation) System là một hệ thống RAG 
 [Cross-Encoder Reranking]
      |
      v
-[Answer Generation] (GPT-4o / Gemini Flash Lite)
+[Answer Generation] (OpenAI GPT models)
      |
      v
 [Response to User]
@@ -380,9 +380,9 @@ Adaptive RAG (Retrieval-Augmented Generation) System là một hệ thống RAG 
   - Non-hop call cho adaptive controller, lấy logprobs để tính entropy
   - Temperature: 0.01, Max tokens: 64
 
-- `generate_answer(query, context_chunks, language, model, provider)`:
-  - Answer generation với OpenAI GPT-4o hoặc Google Gemini 2.5 Flash Lite (mặc định Gemini Flash Lite)
-  - Temperature: 0.7, Max tokens: 50000
+- `generate_answer(query, context_chunks, language, model)`:
+  - Answer generation với OpenAI GPT models (GPT-4o, GPT-5, GPT-4.1, etc.)
+  - Temperature: 0.7, Max tokens: 4000
   - Prompt được tối ưu: thân thiện, đúng trọng tâm, không icon/emoji, Markdown rõ ràng, hỗ trợ EN/VI, hiểu bối cảnh Adaptive RAG (có/không có context)
   - Logging: mỗi lần generate ghi `logs/generation_<timestamp>.json` (system/user prompt, answer, provider/model, error nếu có)
 
@@ -903,11 +903,10 @@ Hệ thống sử dụng language-aware model selection để tự động chọ
 
 #### 7.2.1. LLMConfig
 
-- `query_rewrite_model`: "gpt-4o"
-- `answer_generation_model`: "gpt-4o" (OpenAI) hoặc "gemini-2.5-flash-lite" (Gemini)
-- `answer_generation_provider`: "gemini" (mặc định, có thể đổi "openai")
+- `query_rewrite_model`: "gpt-4.1-nano-2025-04-14"
+- `answer_generation_model`: "gpt-5-nano-2025-08-07" (có thể cấu hình các model OpenAI khác)
 - `query_rewrite_temperature`: 0.3, `query_rewrite_max_tokens`: 200
-- `answer_generation_temperature`: 0.7, `answer_generation_max_tokens`: 50000
+- `answer_generation_temperature`: 0.7, `answer_generation_max_tokens`: 4000
 
 #### 7.2.2. RetrievalConfig
 
@@ -987,7 +986,6 @@ k_min = config.adaptive.k_min
 ### 8.4. LLM Integration
 
 - `openai>=1.0.0`: OpenAI API client
-- `google-generativeai>=0.3.0`: Gemini API client
 
 ### 8.5. Frontend
 

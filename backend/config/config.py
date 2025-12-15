@@ -17,12 +17,6 @@ All parameters are organized into logical groups:
 from dataclasses import dataclass, field
 from typing import Optional, List
 
-# Global provider setting for answer generation
-# Options: "openai" or "gemini"
-# Change this to switch between OpenAI and Gemini for answer generation
-# Note: Phase 1 (adaptive k selection) always uses OpenAI (requires logprobs)
-# PROVIDER = "openai"
-PROVIDER = "gemini"
 
 @dataclass
 class LLMConfig:
@@ -37,26 +31,32 @@ class LLMConfig:
     # Model names
     # OpenAI model to use for query rewriting
     # Options: "gpt-4o", "gpt-4-turbo", "gpt-3.5-turbo", etc.
-    query_rewrite_model: str = "gpt-4o"
+    # query_rewrite_model: str = "gpt-4o"
+    query_rewrite_model: str = "gpt-4.1-nano-2025-04-14"
+    
     
     # OpenAI model to use for answer generation
-    # Options: "gpt-4o", "gpt-4-turbo", "gpt-3.5-turbo", etc.
-    answer_generation_model: str = "gpt-4o"
+    answer_generation_model: str = "gpt-4o-mini-2024-07-18"
     
-    # Answer generation model provider
-    # Options: "openai", "gemini"
-    # If "gemini", uses Google Gemini API with GEMINI_API_KEY
-    # This is set from the global PROVIDER variable in this module
-    answer_generation_provider: str = "openai"
-    # Gemini model configuration (only used if answer_generation_provider == "gemini")
-    # Model name for Gemini
-    # Common options: "gemini-2.5-flash", 
-    # Set to your preferred model name
-    gemini_model: str = "gemini-2.5-flash-lite"
+    # Available models for answer generation (used by API and frontend)
+    # Older model 4.
+    # Reasoning model 5.
+    available_answer_models: List[str] = field(default_factory=lambda: [
+        # Older model 4.
+        "gpt-4.1-2025-04-14",
+        "gpt-4.1-mini-2025-04-14",
+        "gpt-4.1-nano-2025-04-14",
+        "gpt-4o-mini-2024-07-18",
+        # Reasoning model 5.
+        "gpt-5.1-2025-11-13",
+        "gpt-5-2025-08-07",
+        "gpt-5-mini-2025-08-07",
+        "gpt-5-nano-2025-08-07",
+    ])
     
-    # Gemini API Key (read from GEMINI_API_KEY env var)
-    # Will be loaded from environment variable
-    gemini_api_key: Optional[str] = None
+    def is_gpt5_model(self, model_name: str) -> bool:
+        """Check if model is a GPT-5 model (reasoning model)."""
+        return model_name.startswith("gpt-5")
     
     # Query Rewriting Parameters
     # Temperature controls randomness in query rewriting
@@ -77,7 +77,9 @@ class LLMConfig:
     # Maximum tokens for answer generation
     # Adjust based on expected answer length
     # 1000 tokens ≈ 750 words
-    answer_generation_max_tokens: int = 50000
+    # For GPT-5.1 models with extended context, can use higher values
+    # Note: If you see "finish_reason: length" errors, increase this value
+    answer_generation_max_tokens: int = 4000  # Increased from 1000 to handle longer responses
 
 
 @dataclass
@@ -117,7 +119,7 @@ class RetrievalConfig:
     # Range: 0.0 to 1.0
     # Lower values: More results, may include less relevant docs
     # Higher values: Fewer results, more relevant docs
-    default_similarity_threshold: float = 0.6
+    default_similarity_threshold: float = 0.4
     
     def get_dense_model(self, language: str = "en") -> str:
         """Get dense model name based on language."""
@@ -136,15 +138,14 @@ class ChunkingConfig:
     between sentences, creating more coherent chunks than fixed-size splitting.
     
     Supports language-specific thresholds for optimal chunking.
+    Measured using len(string), so this is character count, not token count.
+
     """
     
+
     # Similarity Threshold for Semantic Chunking (Language-specific)
-    # Controls when to split chunks based on sentence similarity
     # Range: 0.0 to 1.0
-    # Lower values (0.3-0.5): More chunks, finer granularity
-    # Higher values (0.6-0.8): Fewer chunks, coarser granularity
-    # English: 0.7 works well for most cases
-    similarity_threshold_en: float = 0.4
+    similarity_threshold_en: float = 0.5
     
     # Vietnamese: May need slightly lower threshold due to different sentence structure
     similarity_threshold_vi: float = 0.5
@@ -154,24 +155,15 @@ class ChunkingConfig:
     
     # Minimum Chunk Size
     # Minimum number of characters per chunk
-    # Prevents creation of very small, fragmented chunks
-    # Too small: Many tiny chunks, inefficient
-    # Too large: May miss natural split points
-    # Recommended: 50-100 characters
-    min_chunk_size: int = 64
+    min_chunk_size: int = 32
     
     # Maximum Chunk Size
     # Maximum number of characters per chunk
-    # Prevents creation of overly large chunks
-    # Too small: May break coherent paragraphs
-    # Too large: May include unrelated content
-    # Recommended: 300-500 characters for most use cases
-    max_chunk_size: int = 1024
+    # n*3 char ~ n chunk
+    max_chunk_size: int = 512
     
     # Embedding Batch Size
     # Number of sentences to process in parallel when computing embeddings
-    # Higher values: Faster processing, more memory usage
-    # Lower values: Slower processing, less memory usage
     # Recommended: 16-64 depending on GPU memory
     embedding_batch_size: int = 32
     
@@ -205,24 +197,47 @@ class AdaptiveConfig:
     # Range: 1-10
     default_n: int = 3
     
-    # Style candidates for adaptive analysis
+    # Style candidates for adaptive analysis (Vietnamese)
     # 10 different response styles to test model uncertainty
-    style_candidates: List[str] = field(default_factory=lambda: [
-        "Trả lời tập trung vào khái niệm cốt lõi",
-        "Trả lời theo phong cách học thuật",
-        "Trả lời ngắn gọn và súc tích",
-        "Trả lời chi tiết và đầy đủ",
-        "Trả lời theo phong cách thân thiện",
-        "Trả lời với ví dụ cụ thể",
-        "Trả lời theo dạng danh sách",
-        "Trả lời với giải thích từng bước",
-        "Trả lời so sánh và đối chiếu",
-        "Trả lời với ngữ cảnh lịch sử"
+    # Designed to create slightly different responses without extreme entropy outliers
+    style_candidates_vi: List[str] = field(default_factory=lambda: [
+        "Trả lời câu hỏi một cách ngắn gọn và rõ ràng",
+        "Trả lời câu hỏi một cách ngắn gọn, sử dụng ngôn ngữ tự nhiên",
+        "Trả lời câu hỏi một cách ngắn gọn với cách diễn đạt đơn giản",
+        "Trả lời câu hỏi một cách ngắn gọn, tập trung vào thông tin chính",
+        "Trả lời câu hỏi một cách ngắn gọn với cấu trúc câu rõ ràng",
+        "Trả lời câu hỏi một cách ngắn gọn, sử dụng từ ngữ phù hợp",
+        "Trả lời câu hỏi một cách ngắn gọn với cách trình bày logic",
+        "Trả lời câu hỏi một cách ngắn gọn, đảm bảo tính chính xác",
+        "Trả lời câu hỏi một cách ngắn gọn với cách diễn đạt dễ hiểu",
+        "Trả lời câu hỏi một cách ngắn gọn, cung cấp thông tin cần thiết"
     ])
     
+    # Style candidates for adaptive analysis (English)
+    # 10 different response styles to test model uncertainty
+    # Designed to create slightly different responses without extreme entropy outliers
+    style_candidates_en: List[str] = field(default_factory=lambda: [
+        "Answer briefly and clearly",
+        "Answer briefly using natural language",
+        "Answer briefly with simple expression",
+        "Answer briefly, focusing on key information",
+        "Answer briefly with clear sentence structure",
+        "Answer briefly using appropriate vocabulary",
+        "Answer briefly with logical presentation",
+        "Answer briefly, ensuring accuracy",
+        "Answer briefly with easy-to-understand expression",
+        "Answer briefly, providing necessary information"
+    ])
     # Phase 1 Model (for adaptive analysis)
     # Model used for non-hop calls to calculate entropy
+    # Must support logprobs parameter
+    # Options (fastest to slowest):
+    # - "gpt-4o-mini": Fastest, cheapest, recommended for speed
+    # - "gpt-3.5-turbo": Very fast, cheaper alternative
+    # - "gpt-4-turbo": Faster than gpt-4o, better quality than mini
+    # - "gpt-4o": Slower but highest quality (original default)
     phase1_model: str = "gpt-4o"
+    # phase1_model: str = "gpt-4o-mini"
     
     # Phase 1 Temperature
     # Temperature for adaptive analysis calls
@@ -287,7 +302,25 @@ class FusionConfig:
     # Higher values (60-100): More smoothing, less difference between ranks
     # Lower values (20-40): Less smoothing, more emphasis on top ranks
     # Recommended: 60 for balanced fusion
-    k_rrf: int = 60
+    k_rrf: int = 40
+    
+    # Number of documents to retrieve from each method before RRF fusion
+    # These are multipliers based on adaptive k value
+    # Formula: num_of_dense_chunk = dense_chunk_multiplier * k_adaptive
+    # Formula: num_of_sparse_chunk = sparse_chunk_multiplier * k_adaptive
+    # Higher values: More candidates for RRF, potentially better quality but slower
+    # Lower values: Fewer candidates, faster but may miss good documents
+    # Recommended: 20-50 for balanced trade-off between accuracy and latency
+    dense_chunk_multiplier: float = 30.0
+    sparse_chunk_multiplier: float = 30.0
+    
+    # Number of candidates to select from RRF for cross-encoder reranking
+    # Formula: num_of_cross_encoder_candidates = cross_encoder_multiplier * k_adaptive
+    # These candidates will be reranked by cross-encoder, then top k will be selected
+    # Higher values: More candidates reranked, potentially better quality but slower
+    # Lower values: Fewer candidates reranked, faster but may miss good documents
+    # Recommended: 3-10 for balanced trade-off
+    cross_encoder_multiplier: float = 10.0
 
 
 @dataclass
@@ -338,12 +371,7 @@ class RAGConfig:
     
     def __init__(self):
         """Initialize all configuration sub-modules."""
-        import os
         self.llm = LLMConfig()
-        # Set provider from global PROVIDER variable
-        self.llm.answer_generation_provider = PROVIDER
-        # Load Gemini API key from environment if available
-        self.llm.gemini_api_key = os.getenv("GEMINI_API_KEY")
         self.retrieval = RetrievalConfig()
         self.chunking = ChunkingConfig()
         self.adaptive = AdaptiveConfig()

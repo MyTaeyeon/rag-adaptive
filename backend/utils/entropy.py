@@ -46,13 +46,13 @@ def entropy_to_k(average_entropy: float, k_min: int, k_max: int, entropy_max: fl
         Số documents cần retrieve (k)
     """
     # Quy tắc ngưỡng: rất chắc chắn → k_min; rất không chắc → k_max
-    if average_entropy <= 0.2:
+    if average_entropy <= 0.25:
         return k_min
-    if average_entropy >= 0.4:
+    if average_entropy >= 0.45:
         return k_max
 
     # Linear mapping trong vùng chuyển tiếp [0.2, 0.4]
-    normalized_entropy = (average_entropy - 0.2) / 0.2  # map 0.2->0, 0.4->1
-    k = int(k_min + normalized_entropy * (k_max - k_min))
+    normalized_entropy = (average_entropy - 0.25) / 0.2  # map 0.2->0, 0.4->1
+    k = int(k_min + normalized_entropy * (k_max - k_min)) + 1
     return max(k_min, min(k_max, k))
 

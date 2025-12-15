@@ -8,43 +8,21 @@ from ..services.llm_service import generate_with_logprobs
 Language = Literal["en", "vi"]
 
 
-def _get_style_by_language(style: str, language: str = "en") -> str:
+def _get_style_candidates(language: str = "en") -> List[str]:
     """
-    Get style instruction in the correct language.
+    Get style candidates based on language.
     
     Args:
-        style: Original style instruction (usually Vietnamese from config)
         language: Target language code
     
     Returns:
-        Style instruction in the target language
+        List of style candidates in the target language
     """
+    config = get_config()
     if language == "vi":
-        return style
+        return config.adaptive.style_candidates_vi
     else:
-        # Translate style to English if needed, or use English styles
-        english_styles = [
-            "Answer briefly and concisely",
-            "Answer in detail and comprehensively",
-            "Answer in academic style",
-            "Answer in friendly style",
-            "Answer with specific examples",
-            "Answer in list format",
-            "Answer step by step",
-            "Focus on core concepts",
-            "Answer with comparison and contrast",
-            "Answer with historical context"
-        ]
-        # Use corresponding English style
-        config = get_config()
-        try:
-            style_idx = config.adaptive.style_candidates.index(style) if style in config.adaptive.style_candidates else 0
-            if style_idx < len(english_styles):
-                return english_styles[style_idx]
-        except (AttributeError, ValueError):
-            pass
-        # Fallback to first English style if style not found
-        return english_styles[0] if english_styles else style
+        return config.adaptive.style_candidates_en
 
 
 def _build_style_prompt(query: str, style: str, language: str = "en") -> str:
@@ -53,14 +31,13 @@ def _build_style_prompt(query: str, style: str, language: str = "en") -> str:
     
     Args:
         query: User query
-        style: Style instruction (will be converted to correct language)
+        style: Style instruction (already in correct language)
         language: Language code
     
     Returns:
         Style prompt string
     """
-    style_in_language = _get_style_by_language(style, language)
-    return f"{style_in_language}:\n\n{query}"
+    return f"{style}:\n\n{query}"
 
 
 class AdaptiveController:
@@ -114,10 +91,13 @@ class AdaptiveController:
         iterations_detail = []
         entropies = []
         
+        # Get style candidates based on language
+        style_candidates = _get_style_candidates(language)
+        
         # Phase 1: Run n iterations with different styles
         for i in range(n):
             # Select style (cycle through if n > len(styles))
-            style = self.config.adaptive.style_candidates[i % len(self.config.adaptive.style_candidates)]
+            style = style_candidates[i % len(style_candidates)]
             style_prompt = _build_style_prompt(query, style, language)
             
             # Generate with logprobs (non-hop call)
@@ -139,11 +119,10 @@ class AdaptiveController:
             
             entropies.append(entropy)
             
-            # Store iteration details with style in correct language
-            style_in_language = _get_style_by_language(style, language)
+            # Store iteration details with style (already in correct language)
             iterations_detail.append({
                 "run": i + 1,
-                "style": style_in_language,
+                "style": style,
                 "output": gen_result.get("output", ""),
                 "entropy": entropy
             })

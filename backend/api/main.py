@@ -239,52 +239,194 @@ async def run_query(name: str, req: QueryRequest) -> QueryResponse:
     if k == 0:
         results = []
         retrieval_time = 0.0
+        retrieval_details = {
+            "dense_retrieval": {"time": 0.0, "num_results": 0, "num_of_dense_chunk": 0},
+            "sparse_retrieval": {"time": 0.0, "num_results": 0, "num_of_sparse_chunk": 0},
+            "hybrid_retrieval": {
+                "rrf_rerank": {"time": 0.0, "num_results": 0, "num_of_cross_encoder_candidates": 0, "num_of_dense_chunk": 0, "num_of_sparse_chunk": 0},
+                "cross_encoder": {
+                    "time": 0.0,
+                    "selected_candidates": {"num_candidates": 0, "documents": []},
+                    "top_k_results": {"num_results": 0, "documents": []}
+                }
+            },
+            "output": {"documents": [], "num_results": 0}
+        }
     else:
         # Perform retrieval
         retrieval_query = rewritten_query if rewritten_query else req.query
-        bm25_results = coll.bm25.retrieve(retrieval_query, k)
-        dense_results = coll.dense.retrieve(retrieval_query, k)
         
-        # Fuse the results with RRF
-        fused = reciprocal_rank_fusion([bm25_results, dense_results], k, k_rrf=config.fusion.k_rrf)
+        # Calculate number of documents to retrieve from each method
+        num_of_dense_chunk = max(1, int(config.fusion.dense_chunk_multiplier * k))
+        num_of_sparse_chunk = max(1, int(config.fusion.sparse_chunk_multiplier * k))
+        num_of_cross_encoder_candidates = max(k, int(config.fusion.cross_encoder_multiplier * k))
         
-        # Gather candidate texts and re-rank with cross-encoder
+        # 1. Dense Retrieval
+        dense_start = time.time()
+        dense_results = coll.dense.retrieve(retrieval_query, num_of_dense_chunk)
+        dense_time = round(time.time() - dense_start, 2)
+        
+        # Prepare top 10 dense candidates for preview
+        top_10_dense_candidates = []
+        for i, (idx, score) in enumerate(dense_results[:10]):
+            top_10_dense_candidates.append({
+                "index": i + 1,
+                "text": coll.chunks[idx],
+                "score": round(score, 4),
+                "metadata": coll.metadata[idx]
+            })
+        
+        # 2. Sparse Retrieval
+        sparse_start = time.time()
+        bm25_results = coll.bm25.retrieve(retrieval_query, num_of_sparse_chunk)
+        sparse_time = round(time.time() - sparse_start, 2)
+        
+        # Prepare top 10 sparse candidates for preview
+        top_10_sparse_candidates = []
+        for i, (idx, score) in enumerate(bm25_results[:10]):
+            top_10_sparse_candidates.append({
+                "index": i + 1,
+                "text": coll.chunks[idx],
+                "score": round(score, 4),
+                "metadata": coll.metadata[idx]
+            })
+        
+        # 3. Hybrid Retrieval
+        # 3.1 RRF Rerank
+        rrf_start = time.time()
+        # RRF fuse all candidates and get top num_of_cross_encoder_candidates
+        fused = reciprocal_rank_fusion([bm25_results, dense_results], num_of_cross_encoder_candidates, k_rrf=config.fusion.k_rrf)
+        rrf_time = round(time.time() - rrf_start, 2)
+        
+        # Prepare top 10 RRF candidates for preview
+        top_10_rrf_candidates = []
+        for i, (idx, rrf_score) in enumerate(fused[:10]):
+            top_10_rrf_candidates.append({
+                "index": i + 1,
+                "text": coll.chunks[idx],
+                "rrf_score": round(rrf_score, 4),
+                "score": round(rrf_score, 4),
+                "metadata": coll.metadata[idx]
+            })
+        
+        # 3.2 Cross-Encoder
+        cross_encoder_start = time.time()
         candidate_indices = [idx for idx, _ in fused]
         candidate_texts = [coll.chunks[idx] for idx in candidate_indices]
         rerank_scores = coll.reranker.rerank(retrieval_query, candidate_texts)
+        cross_encoder_time = round(time.time() - cross_encoder_start, 2)
         
-        # Combine RRF and reranker scores
+        # Combine RRF and reranker scores, then sort by rerank_score
         combined = [
             (idx, rrf_score, rr_score)
             for (idx, rrf_score), rr_score in zip(fused, rerank_scores)
         ]
         combined.sort(key=lambda x: x[2], reverse=True)
         
+        # Get top k from cross-encoder results
+        top_k_combined = combined[:k]
+        
+        # Prepare cross-encoder documents (all candidates for display)
+        all_cross_encoder_documents = []
+        for (idx, rrf_score), rr_score in zip(fused, rerank_scores):
+            all_cross_encoder_documents.append({
+                "index": len(all_cross_encoder_documents) + 1,
+                "text": coll.chunks[idx],
+                "rrf_score": round(rrf_score, 4),
+                "rerank_score": round(rr_score, 4),
+                "score": round(rr_score, 4),
+                "label": "accepted" if rr_score >= 0 else "denied",
+                "metadata": coll.metadata[idx]
+            })
+        
+        # Prepare top 10 cross-encoder candidates for preview (sorted by rerank_score)
+        top_10_cross_encoder_candidates = sorted(
+            all_cross_encoder_documents,
+            key=lambda x: x["rerank_score"],
+            reverse=True
+        )[:10]
+        
+        # Top k documents after cross-encoder reranking
+        top_k_documents = []
+        for idx, rrf_score, rr_score in top_k_combined:
+            top_k_documents.append({
+                "index": len(top_k_documents) + 1,
+                "text": coll.chunks[idx],
+                "rrf_score": round(rrf_score, 4),
+                "rerank_score": round(rr_score, 4),
+                "score": round(rr_score, 4),
+                "label": "accepted" if rr_score >= 0 else "denied",
+                "metadata": coll.metadata[idx]
+            })
+        
+        # 4. Output (final results - top k after cross-encoder)
+        output_documents = top_k_documents.copy()
         results = []
-        for idx, rrf_score, rr_score in combined[:k]:
-            data = {
+        for idx, rrf_score, rr_score in top_k_combined:
+            results.append({
                 "text": coll.chunks[idx],
                 "metadata": coll.metadata[idx],
                 "rrf_score": rrf_score,
                 "rerank_score": rr_score,
                 "score": rr_score,
-            }
-            results.append(data)
+            })
+        
         retrieval_time = round(time.time() - step3_retrieval_start, 2)
+        
+        retrieval_details = {
+            "dense_retrieval": {
+                "time": dense_time,
+                "num_results": len(dense_results),
+                "num_of_dense_chunk": num_of_dense_chunk,
+                "top_10_candidates": top_10_dense_candidates
+            },
+            "sparse_retrieval": {
+                "time": sparse_time,
+                "num_results": len(bm25_results),
+                "num_of_sparse_chunk": num_of_sparse_chunk,
+                "top_10_candidates": top_10_sparse_candidates
+            },
+            "hybrid_retrieval": {
+                "rrf_rerank": {
+                    "time": rrf_time,
+                    "num_results": len(fused),
+                    "num_of_cross_encoder_candidates": num_of_cross_encoder_candidates,
+                    "num_of_dense_chunk": num_of_dense_chunk,
+                    "num_of_sparse_chunk": num_of_sparse_chunk,
+                    "total_candidates_for_rrf": num_of_dense_chunk + num_of_sparse_chunk,
+                    "top_10_rrf_candidates": top_10_rrf_candidates
+                },
+                "cross_encoder": {
+                    "time": cross_encoder_time,
+                    "selected_candidates": {
+                        "num_candidates": len(all_cross_encoder_documents),
+                        "documents": all_cross_encoder_documents
+                    },
+                    "top_10_cross_encoder_candidates": top_10_cross_encoder_candidates,
+                    "top_k_results": {
+                        "num_results": len(top_k_documents),
+                        "documents": top_k_documents
+                    }
+                }
+            },
+            "output": {
+                "documents": output_documents,
+                "num_results": len(output_documents)
+            }
+        }
     
     # Step 4: Answer generation (with or without results - Adaptive RAG can answer without context)
     answer_data = {}
     step3_start = time.time()
     # Always call generate_answer - it can handle both cases (with/without context)
     # This aligns with Adaptive RAG philosophy where model can answer using its own knowledge
-    # Provider is automatically selected from global PROVIDER config (can be overridden in request)
-    config = get_config()
-    provider = req.answer_model_provider if req.answer_model_provider else config.llm.answer_generation_provider
+    # Use model from request if provided, otherwise use config default
+    answer_model = req.model if req.model else None
     answer_result = generate_answer(
         query=req.query,  # Use original query for answer generation
         context_chunks=results,  # Can be empty list - model will use its own knowledge
         language=query_language,
-        provider=provider  # Use from request if provided, otherwise from global PROVIDER config
+        model=answer_model
     )
     answer_data = {
         "answer": answer_result.get("answer", ""),
@@ -328,7 +470,8 @@ async def run_query(name: str, req: QueryRequest) -> QueryResponse:
             "time": retrieval_time,
             "num_results": len(results),
             "retrieval_query": rewritten_query,
-            "preview_documents": preview_documents
+            "preview_documents": preview_documents,
+            "details": retrieval_details
         },
         "answer_generation": {
             "time": step3_time,
@@ -369,7 +512,14 @@ async def rewrite_only(name: str, req: QueryRequest) -> Dict[str, Any]:
     }
 
 
+@app.get("/models", response_model=List[str])
+async def get_available_models() -> List[str]:
+    """Get list of available answer generation models."""
+    config = get_config()
+    return config.llm.available_answer_models
+
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=1012)
 

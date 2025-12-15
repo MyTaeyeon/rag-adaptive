@@ -14,7 +14,7 @@ pip install -r requirements.txt
 ```bash
 python run_backend.py
 ```
-Backend sẽ chạy tại `http://localhost:5555`
+Backend sẽ chạy tại `http://localhost:1012`
 
 **Frontend (Streamlit):**
 ```bash
@@ -31,7 +31,7 @@ Adaptive RAG là hệ thống RAG tự điều chỉnh k dựa trên entropy, k�
 ### Đặc điểm chính (ngắn gọn)
 - **Adaptive K theo entropy**: Quyết định k dựa trên entropy của LLM (không cần context), phản ánh độ khó câu hỏi.
 - **Hybrid retrieval + RRF**: BM25 (sparse) + semantic embeddings (dense) và hợp nhất bằng Reciprocal Rank Fusion.
-- **Model theo ngôn ngữ**: Chọn embedding/reranker phù hợp EN/VI; answer generation hỗ trợ OpenAI GPT-4o hoặc Gemini 2.5 Flash Lite.
+- **Model theo ngôn ngữ**: Chọn embedding/reranker phù hợp EN/VI; answer generation sử dụng OpenAI GPT models.
 - **Prompt + logging**: System prompt tối ưu (thân thiện, đúng trọng tâm, không icon) và log đầy đủ prompt/answer để debug.
 
 ## RAG Pipeline
@@ -75,7 +75,7 @@ Sử dụng **Cross-Encoder reranker (cross-encoder/ms-marco-MiniLM-L-12-v2)** �
 
 ### 5. Answer Generation
 
-- **Providers**: OpenAI GPT-4o hoặc Google Gemini 2.5 Flash Lite (mặc định chọn Gemini Flash Lite để tối ưu tốc độ).
+- **Provider**: OpenAI GPT models (sử dụng các model GPT-4o, GPT-5, GPT-4.1, etc.).
 - **System prompt**: Tối ưu để trả lời thân thiện, đúng trọng tâm, không icon/emoji, dùng Markdown rõ ràng, hỗ trợ EN/VI, hiểu bối cảnh Adaptive RAG (có hoặc không có context).
 - **Logging**: Mỗi lần generate được lưu `logs/generation_<timestamp>.json` (prompt, answer, provider/model, error nếu có) để debug nhanh.
 
@@ -91,20 +91,23 @@ Hệ thống sử dụng **language-aware model selection** để tự động c
 | **Dense Embedding** | all-mpnet-base-v2 | vietnamese-sbert-v2 | Model chuyên biệt cho từng ngôn ngữ đảm bảo hiệu suất tối ưu |
 | **Semantic Chunking** | all-mpnet-base-v2 | vietnamese-sbert-v2 | Dùng chung với embedding model để đảm bảo consistency |
 | **Reranker** | ms-marco-L-12-v2 | ms-marco-L-12-v2 | Multilingual model với chất lượng cao cho cả hai ngôn ngữ |
-| **Answer Generation** | GPT-4o / Gemini 2.5 Flash Lite | GPT-4o / Gemini 2.5 Flash Lite | GPT-4o và Gemini đều hỗ trợ tốt cả hai ngôn ngữ. Gemini Flash Lite được ưu tiên cho tốc độ |
+| **Answer Generation** | GPT-4o / GPT-5 / GPT-4.1 | GPT-4o / GPT-5 / GPT-4.1 | OpenAI GPT models hỗ trợ tốt cả hai ngôn ngữ với chất lượng cao |
 | **Sparse Retrieval** | BM25 | BM25 | BM25 hoạt động tốt cho cả hai ngôn ngữ với normalization phù hợp |
 
 ### Large Language Models (LLMs)
 
-**GPT-4o (OpenAI)**
-- **Sử dụng**: Query rewriting và answer generation (optional) cho cả tiếng Anh và tiếng Việt
+**OpenAI GPT Models**
+- **Sử dụng**: Query rewriting và answer generation cho cả tiếng Anh và tiếng Việt
 - **Query Rewriting**: 
+  - Model: GPT-4.1-nano-2025-04-14 (có thể cấu hình trong config)
   - Temperature: 0.3 (focused, deterministic)
   - Max tokens: 200
   - Mục đích: Viết lại và mở rộng câu hỏi để cải thiện retrieval
-- **Answer Generation** (khi được chọn):
+- **Answer Generation**:
+  - Model: GPT-5-nano-2025-08-07 (có thể cấu hình trong config)
+  - Các model khác có thể dùng: GPT-4.1, GPT-5, GPT-5-mini, GPT-5.1, etc.
   - Temperature: 0.7 (balanced creativity and accuracy)
-  - Max tokens: 50000
+  - Max tokens: 4000
   - Mục đích: Sinh câu trả lời dựa trên context đã retrieve
 
 **Ưu điểm**:
@@ -112,19 +115,7 @@ Hệ thống sử dụng **language-aware model selection** để tự động c
 - Hiểu ngữ cảnh và ngữ nghĩa tốt
 - Sinh văn bản tự nhiên và chính xác
 - Hỗ trợ logprobs cho entropy calculation
-
-**Google Gemini 2.5 Flash Lite**
-- **Sử dụng**: Answer generation (mặc định) cho cả tiếng Anh và tiếng Việt
-- **Answer Generation**:
-  - Temperature: 0.7 (balanced creativity and accuracy)
-  - Max tokens: 50000
-  - Model: gemini-2.5-flash-lite
-
-**Ưu điểm**:
-- Tốc độ nhanh hơn đáng kể so với GPT-4o
-- Chất lượng câu trả lời tốt với system prompts được tối ưu
-- Chi phí thấp hơn
-- Hỗ trợ tốt cả tiếng Anh và tiếng Việt
+- Nhiều model options từ nano đến full để tối ưu cost/performance
 
 ### Embedding Models
 
@@ -265,7 +256,7 @@ Tất cả các tham số có thể được cấu hình trong `backend/config/c
 - Number of iterations (n) cho entropy calculation (default: 5)
 - Temperature và max_tokens cho LLM
 - Reranker và fusion parameters
-- Answer generation provider (OpenAI hoặc Gemini)
+- Answer generation model (OpenAI GPT models)
 
 ## Hyperparameter Tuning (tóm tắt)
 

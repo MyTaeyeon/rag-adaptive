@@ -3,7 +3,10 @@ import requests
 import time
 from typing import List, Dict, Any, Optional
 
-BACKEND_URL = "http://localhost:5555"
+# Control the streaming pace on the UI (seconds per update)
+STREAM_DELAY_SECONDS = 0.05
+
+BACKEND_URL = "http://localhost:2022"
 
 
 def estimate_tokens(text: str) -> int:
@@ -99,10 +102,23 @@ def format_file_size(size_bytes: int) -> str:
     return f"{size_bytes:.1f} TB"
 
 
-def query_collection(collection_name: str, query: str, n: Optional[int] = None) -> Dict[str, Any]:
+def get_available_models() -> List[str]:
+    """Get list of available answer generation models."""
+    try:
+        resp = requests.get(f"{BACKEND_URL}/models")
+        if resp.status_code == 200:
+            return resp.json()
+    except Exception:
+        pass
+    return []
+
+
+def query_collection(collection_name: str, query: str, n: Optional[int] = None, model: Optional[str] = None) -> Dict[str, Any]:
     payload = {"query": query}
     if n is not None:
         payload["n"] = n
+    if model is not None:
+        payload["model"] = model
     resp = requests.post(f"{BACKEND_URL}/collections/{collection_name}/query", json=payload)
     if resp.status_code == 200:
         return resp.json()
@@ -174,7 +190,7 @@ with st.sidebar:
             
             # Adaptive iterations selector
             if "adaptive_n" not in st.session_state:
-                st.session_state.adaptive_n = 5
+                st.session_state.adaptive_n = 1
             adaptive_n = st.selectbox(
                 "Adaptive Iterations (n)",
                 options=list(range(1, 11)),
@@ -315,6 +331,22 @@ with st.sidebar:
 if st.session_state.selected_collection:
     st.title("Chat")
     
+    # Model selector above chat input
+    if "selected_model" not in st.session_state:
+        # Initialize with default model from config
+        st.session_state.selected_model = None
+    
+    available_models = get_available_models()
+    if available_models:
+        selected_model = st.selectbox(
+            "Select Model",
+            options=available_models,
+            index=available_models.index(st.session_state.selected_model) if st.session_state.selected_model in available_models else 0,
+            key="model_selector",
+            help="Choose the OpenAI model for answer generation"
+        )
+        st.session_state.selected_model = selected_model
+    
     for message in st.session_state.messages:
         with st.chat_message(message["role"], avatar=ROLE_AVATARS.get(message["role"])):
             # Use container to ensure full markdown rendering without truncation
@@ -360,15 +392,127 @@ if st.session_state.selected_collection:
                     
                     if "retrieval" in steps:
                         step_time = steps['retrieval'].get('time', 0)
+                        retrieval_details = steps['retrieval'].get('details', {})
+                        num_results = steps['retrieval'].get('num_results', 0)
+                        
                         with st.status(f"Step 3: Retrieval ({step_time}s)", expanded=False):
-                            st.write(f"Found {steps['retrieval'].get('num_results', 0)} documents")
-                            preview_docs = steps['retrieval'].get('preview_documents', [])
-                            if preview_docs:
-                                st.write("**Preview documents:**")
-                                for doc in preview_docs:
-                                    with st.expander(f"Document {doc.get('index', 0)} (score: {doc.get('score', 0):.4f})", expanded=False):
-                                        st.caption(f"Source: {doc.get('metadata', {}).get('source', 'Unknown')}")
-                                        st.text(doc.get('text', ''))
+                            st.write(f"Found {num_results} documents")
+                            
+                            # If k = 0, only show the count and skip all sub-steps
+                            if num_results == 0:
+                                pass
+                            else:
+                                # 3.1 Dense Retrieval
+                                if "dense_retrieval" in retrieval_details:
+                                    dense_info = retrieval_details["dense_retrieval"]
+                                    num_of_dense_chunk = dense_info.get('num_of_dense_chunk', dense_info.get('num_results', 0))
+                                    with st.expander(f"3.1 Dense Retrieval ({dense_info.get('time', 0)}s)", expanded=False):
+                                        st.write(f"Selected {num_of_dense_chunk} dense candidates")
+                                        
+                                        # Preview top 10 dense candidates
+                                        top_10_dense = dense_info.get('top_10_candidates', [])
+                                        if top_10_dense:
+                                            st.write("**Preview top 10 highest dense score candidates**")
+                                            for candidate in top_10_dense:
+                                                with st.expander(
+                                                    f"3.1.{candidate.get('index', 0)} (score: {candidate.get('score', 0):.4f})",
+                                                    expanded=False
+                                                ):
+                                                    st.caption(f"Source: {candidate.get('metadata', {}).get('source', 'Unknown')}")
+                                                    st.text(candidate.get('text', ''))
+                                
+                                # 3.2 Sparse Retrieval
+                                if "sparse_retrieval" in retrieval_details:
+                                    sparse_info = retrieval_details["sparse_retrieval"]
+                                    num_of_sparse_chunk = sparse_info.get('num_of_sparse_chunk', sparse_info.get('num_results', 0))
+                                    with st.expander(f"3.2 Sparse Retrieval ({sparse_info.get('time', 0)}s)", expanded=False):
+                                        st.write(f"Selected {num_of_sparse_chunk} sparse candidates")
+                                        
+                                        # Preview top 10 sparse candidates
+                                        top_10_sparse = sparse_info.get('top_10_candidates', [])
+                                        if top_10_sparse:
+                                            st.write("**Preview top 10 highest sparse score candidates**")
+                                            for candidate in top_10_sparse:
+                                                with st.expander(
+                                                    f"3.2.{candidate.get('index', 0)} (score: {candidate.get('score', 0):.4f})",
+                                                    expanded=False
+                                                ):
+                                                    st.caption(f"Source: {candidate.get('metadata', {}).get('source', 'Unknown')}")
+                                                    st.text(candidate.get('text', ''))
+                                
+                                # 3.3 Hybrid Retrieval
+                                if "hybrid_retrieval" in retrieval_details:
+                                    hybrid_info = retrieval_details["hybrid_retrieval"]
+                                    with st.expander("3.3 Hybrid Retrieval", expanded=False):
+                                        # 3.3.1 RRF Fusion
+                                        if "rrf_rerank" in hybrid_info:
+                                            rrf_info = hybrid_info["rrf_rerank"]
+                                            total_rrf_candidates = rrf_info.get('total_candidates_for_rrf', 0)
+                                            with st.expander(f"3.3.1 RRF Fusion ({rrf_info.get('time', 0)}s)", expanded=False):
+                                                st.write(f"Selected {total_rrf_candidates} candidates to calculate RRF score")
+                                                
+                                                # Preview top 10 RRF candidates
+                                                top_10_rrf = rrf_info.get('top_10_rrf_candidates', [])
+                                                if top_10_rrf:
+                                                    st.write("**Preview top 10 highest RRF score candidates**")
+                                                    for candidate in top_10_rrf:
+                                                        with st.expander(
+                                                            f"3.3.1.{candidate.get('index', 0)} (RRF score: {candidate.get('rrf_score', 0):.4f})",
+                                                            expanded=False
+                                                        ):
+                                                            st.caption(f"Source: {candidate.get('metadata', {}).get('source', 'Unknown')}")
+                                                            st.text(candidate.get('text', ''))
+                                        
+                                        # 3.3.2 Cross-Encoder Rerank
+                                        if "cross_encoder" in hybrid_info:
+                                            ce_info = hybrid_info["cross_encoder"]
+                                            selected_candidates_count = ce_info.get('selected_candidates', {}).get('num_candidates', 0)
+                                            with st.expander(f"3.3.2 Cross-Encoder Rerank ({ce_info.get('time', 0)}s)", expanded=False):
+                                                st.write(f"Selected {selected_candidates_count} candidates with highest RRF score")
+                                                st.write("Calculate Cross-Encoder Score")
+                                                st.write("Ranking by cross-encoder score")
+                                                
+                                                # Preview top 10 cross-encoder candidates
+                                                top_10_ce = ce_info.get('top_10_cross_encoder_candidates', [])
+                                                if top_10_ce:
+                                                    st.write("**Preview top 10 highest Cross-Encoder score candidates**")
+                                                    for candidate in top_10_ce:
+                                                        label = candidate.get('label', 'unknown')
+                                                        label_color = "green" if label == "accepted" else "red"
+                                                        with st.expander(
+                                                            f"3.3.2.{candidate.get('index', 0)} (score: {candidate.get('rerank_score', 0):.4f}, state: {label})",
+                                                            expanded=False
+                                                        ):
+                                                            st.markdown(f"**State:** <span style='color: {label_color}'>{label.upper()}</span>", unsafe_allow_html=True)
+                                                            st.caption(f"Source: {candidate.get('metadata', {}).get('source', 'Unknown')}")
+                                                            st.caption(f"RRF Score: {candidate.get('rrf_score', 0):.4f} | Cross-Encoder Score: {candidate.get('rerank_score', 0):.4f}")
+                                                            st.text(candidate.get('text', ''))
+                                
+                                # 3.4 Final Top K Chunks
+                                if "output" in retrieval_details:
+                                    output_info = retrieval_details["output"]
+                                    with st.expander(f"3.4 Final Top K Chunks ({output_info.get('num_results', 0)} docs)", expanded=False):
+                                        for doc in output_info.get("documents", []):
+                                            label = doc.get('label', 'accepted')
+                                            label_color = "green" if label == "accepted" else "red"
+                                            with st.expander(
+                                                f"3.4.{doc.get('index', 0)} (score: {doc.get('score', 0):.4f}, state: {label})",
+                                                expanded=False
+                                            ):
+                                                st.markdown(f"**State:** <span style='color: {label_color}'>{label.upper()}</span>", unsafe_allow_html=True)
+                                                st.caption(f"Source: {doc.get('metadata', {}).get('source', 'Unknown')}")
+                                                st.caption(f"Cross-Encoder Score: {doc.get('rerank_score', 0):.4f}")
+                                                st.text(doc.get('text', ''))
+                            
+                            # Backward compatibility: Show preview_documents if details not available
+                            if not retrieval_details:
+                                preview_docs = steps['retrieval'].get('preview_documents', [])
+                                if preview_docs:
+                                    st.write("**Preview documents:**")
+                                    for doc in preview_docs:
+                                        with st.expander(f"Document {doc.get('index', 0)} (score: {doc.get('score', 0):.4f})", expanded=False):
+                                            st.caption(f"Source: {doc.get('metadata', {}).get('source', 'Unknown')}")
+                                            st.text(doc.get('text', ''))
                     
                     if "answer_generation" in steps:
                         step_time = steps['answer_generation'].get('time', 0)
@@ -383,9 +527,10 @@ if st.session_state.selected_collection:
             st.markdown(prompt)
         
         with st.chat_message("assistant", avatar=ROLE_AVATARS["assistant"]):
-            with st.spinner("Processing..."):
-                n = st.session_state.get("adaptive_n", 5)
-                response = query_collection(st.session_state.selected_collection, prompt, n=n)
+            with st.spinner("Thinking..."):
+                n = st.session_state.get("adaptive_n", 1)
+                model = st.session_state.get("selected_model")
+                response = query_collection(st.session_state.selected_collection, prompt, n=n, model=model)
             
             if response:
                 answer = response.get("answer", "")
@@ -405,7 +550,7 @@ if st.session_state.selected_collection:
                         # Update after each complete sentence
                         if i > 0 and (i % 2 == 0 or i == len(sentence_parts) - 1):
                             answer_placeholder.markdown(streamed_text)
-                            time.sleep(0.03)
+                            time.sleep(STREAM_DELAY_SECONDS)
                     
                     # Final render to ensure complete markdown is displayed without truncation
                     # Clear placeholder and render final answer
@@ -452,15 +597,127 @@ if st.session_state.selected_collection:
                         
                         if "retrieval" in pipeline_steps:
                             step_time = pipeline_steps['retrieval'].get('time', 0)
+                            retrieval_details = pipeline_steps['retrieval'].get('details', {})
+                            num_results = pipeline_steps['retrieval'].get('num_results', 0)
+                            
                             with st.status(f"Step 3: Retrieval ({step_time}s)", expanded=False):
-                                st.write(f"Found {pipeline_steps['retrieval'].get('num_results', 0)} documents")
-                                preview_docs = pipeline_steps['retrieval'].get('preview_documents', [])
-                                if preview_docs:
-                                    st.write("**Preview documents:**")
-                                    for doc in preview_docs:
-                                        with st.expander(f"Document {doc.get('index', 0)} (score: {doc.get('score', 0):.4f})", expanded=False):
-                                            st.caption(f"Source: {doc.get('metadata', {}).get('source', 'Unknown')}")
-                                            st.text(doc.get('text', ''))
+                                st.write(f"Found {num_results} documents")
+                                
+                                # If k = 0, only show the count and skip all sub-steps
+                                if num_results == 0:
+                                    pass
+                                else:
+                                    # 3.1 Dense Retrieval
+                                    if "dense_retrieval" in retrieval_details:
+                                        dense_info = retrieval_details["dense_retrieval"]
+                                        num_of_dense_chunk = dense_info.get('num_of_dense_chunk', dense_info.get('num_results', 0))
+                                        with st.expander(f"3.1 Dense Retrieval ({dense_info.get('time', 0)}s)", expanded=False):
+                                            st.write(f"Selected {num_of_dense_chunk} dense candidates")
+                                            
+                                            # Preview top 10 dense candidates
+                                            top_10_dense = dense_info.get('top_10_candidates', [])
+                                            if top_10_dense:
+                                                st.write("**Preview top 10 highest dense score candidates**")
+                                                for candidate in top_10_dense:
+                                                    with st.expander(
+                                                        f"3.1.{candidate.get('index', 0)} (score: {candidate.get('score', 0):.4f})",
+                                                        expanded=False
+                                                    ):
+                                                        st.caption(f"Source: {candidate.get('metadata', {}).get('source', 'Unknown')}")
+                                                        st.text(candidate.get('text', ''))
+                                    
+                                    # 3.2 Sparse Retrieval
+                                    if "sparse_retrieval" in retrieval_details:
+                                        sparse_info = retrieval_details["sparse_retrieval"]
+                                        num_of_sparse_chunk = sparse_info.get('num_of_sparse_chunk', sparse_info.get('num_results', 0))
+                                        with st.expander(f"3.2 Sparse Retrieval ({sparse_info.get('time', 0)}s)", expanded=False):
+                                            st.write(f"Selected {num_of_sparse_chunk} sparse candidates")
+                                            
+                                            # Preview top 10 sparse candidates
+                                            top_10_sparse = sparse_info.get('top_10_candidates', [])
+                                            if top_10_sparse:
+                                                st.write("**Preview top 10 highest sparse score candidates**")
+                                                for candidate in top_10_sparse:
+                                                    with st.expander(
+                                                        f"3.2.{candidate.get('index', 0)} (score: {candidate.get('score', 0):.4f})",
+                                                        expanded=False
+                                                    ):
+                                                        st.caption(f"Source: {candidate.get('metadata', {}).get('source', 'Unknown')}")
+                                                        st.text(candidate.get('text', ''))
+                                    
+                                    # 3.3 Hybrid Retrieval
+                                    if "hybrid_retrieval" in retrieval_details:
+                                        hybrid_info = retrieval_details["hybrid_retrieval"]
+                                        with st.expander("3.3 Hybrid Retrieval", expanded=False):
+                                            # 3.3.1 RRF Fusion
+                                            if "rrf_rerank" in hybrid_info:
+                                                rrf_info = hybrid_info["rrf_rerank"]
+                                                total_rrf_candidates = rrf_info.get('total_candidates_for_rrf', 0)
+                                                with st.expander(f"3.3.1 RRF Fusion ({rrf_info.get('time', 0)}s)", expanded=False):
+                                                    st.write(f"Selected {total_rrf_candidates} candidates to calculate RRF score")
+                                                    
+                                                    # Preview top 10 RRF candidates
+                                                    top_10_rrf = rrf_info.get('top_10_rrf_candidates', [])
+                                                    if top_10_rrf:
+                                                        st.write("**Preview top 10 highest RRF score candidates**")
+                                                        for candidate in top_10_rrf:
+                                                            with st.expander(
+                                                                f"3.3.1.{candidate.get('index', 0)} (RRF score: {candidate.get('rrf_score', 0):.4f})",
+                                                                expanded=False
+                                                            ):
+                                                                st.caption(f"Source: {candidate.get('metadata', {}).get('source', 'Unknown')}")
+                                                                st.text(candidate.get('text', ''))
+                                            
+                                            # 3.3.2 Cross-Encoder Rerank
+                                            if "cross_encoder" in hybrid_info:
+                                                ce_info = hybrid_info["cross_encoder"]
+                                                selected_candidates_count = ce_info.get('selected_candidates', {}).get('num_candidates', 0)
+                                                with st.expander(f"3.3.2 Cross-Encoder Rerank ({ce_info.get('time', 0)}s)", expanded=False):
+                                                    st.write(f"Selected {selected_candidates_count} candidates with highest RRF score")
+                                                    st.write("Calculate Cross-Encoder Score")
+                                                    st.write("Ranking by cross-encoder score")
+                                                    
+                                                    # Preview top 10 cross-encoder candidates
+                                                    top_10_ce = ce_info.get('top_10_cross_encoder_candidates', [])
+                                                    if top_10_ce:
+                                                        st.write("**Preview top 10 highest Cross-Encoder score candidates**")
+                                                        for candidate in top_10_ce:
+                                                            label = candidate.get('label', 'unknown')
+                                                            label_color = "green" if label == "accepted" else "red"
+                                                            with st.expander(
+                                                                f"3.3.2.{candidate.get('index', 0)} (score: {candidate.get('rerank_score', 0):.4f}, state: {label})",
+                                                                expanded=False
+                                                            ):
+                                                                st.markdown(f"**State:** <span style='color: {label_color}'>{label.upper()}</span>", unsafe_allow_html=True)
+                                                                st.caption(f"Source: {candidate.get('metadata', {}).get('source', 'Unknown')}")
+                                                                st.caption(f"RRF Score: {candidate.get('rrf_score', 0):.4f} | Cross-Encoder Score: {candidate.get('rerank_score', 0):.4f}")
+                                                                st.text(candidate.get('text', ''))
+                                    
+                                    # 3.4 Final Top K Chunks
+                                    if "output" in retrieval_details:
+                                        output_info = retrieval_details["output"]
+                                        with st.expander(f"3.4 Final Top K Chunks ({output_info.get('num_results', 0)} docs)", expanded=False):
+                                            for doc in output_info.get("documents", []):
+                                                label = doc.get('label', 'accepted')
+                                                label_color = "green" if label == "accepted" else "red"
+                                                with st.expander(
+                                                    f"3.4.{doc.get('index', 0)} (score: {doc.get('score', 0):.4f}, state: {label})",
+                                                    expanded=False
+                                                ):
+                                                    st.markdown(f"**State:** <span style='color: {label_color}'>{label.upper()}</span>", unsafe_allow_html=True)
+                                                    st.caption(f"Source: {doc.get('metadata', {}).get('source', 'Unknown')}")
+                                                    st.caption(f"Cross-Encoder Score: {doc.get('rerank_score', 0):.4f}")
+                                                    st.text(doc.get('text', ''))
+                                
+                                # Backward compatibility: Show preview_documents if details not available
+                                if not retrieval_details:
+                                    preview_docs = pipeline_steps['retrieval'].get('preview_documents', [])
+                                    if preview_docs:
+                                        st.write("**Preview documents:**")
+                                        for doc in preview_docs:
+                                            with st.expander(f"Document {doc.get('index', 0)} (score: {doc.get('score', 0):.4f})", expanded=False):
+                                                st.caption(f"Source: {doc.get('metadata', {}).get('source', 'Unknown')}")
+                                                st.text(doc.get('text', ''))
                         
                         if "answer_generation" in pipeline_steps:
                             step_time = pipeline_steps['answer_generation'].get('time', 0)

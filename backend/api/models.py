@@ -18,7 +18,7 @@ class QueryRequest(BaseModel):
     query: str
     language: Optional[Language] = None  # Override collection language if provided
     n: Optional[int] = None  # Number of adaptive iterations (1-10)
-    answer_model_provider: Optional[Literal["openai", "gemini"]] = None  # Optional: Override global PROVIDER setting in config.py for this request
+    model: Optional[str] = None  # Model name for answer generation
 
 
 class QueryResponse(BaseModel):
